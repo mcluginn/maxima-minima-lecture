@@ -159,7 +159,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         vid_top = Inches(1.5)
         vid_w = Inches(7.8)
         vid_h = Inches(4.387)
-        add_card(s, vid_left - Inches(0.05), vid_top - Inches(0.05), vid_w + Inches(0.1), vid_h + Inches(0.1), border_color=CYAN)
+        # Borderless seamless video embedding
         try:
             s.shapes.add_movie(video_path, vid_left, vid_top, vid_w, vid_h, poster_frame_image=frame_path, mime_type='video/mp4')
         except Exception:
@@ -339,7 +339,20 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 7: Signature Scene 1 Video - The Cubic Curve
+    # SLIDE 7: MASTER SEQUENCE (THE FULL CONTINUOUS 3BLUE1BROWN MOVIE)
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="🌟 Unified Master Sequence: The Cubic Manifold",
+        video_path="media/videos/clips/SignatureSequenceMaster.mp4",
+        frame_path="media/frames/SignatureSequenceMaster_frame.png",
+        subtitle="Continuous 3Blue1Brown Kinematic Derivation of f(x) = x³ - 3x",
+        prompt_text="Watch the complete sequence flow: curve creation, dynamic rotating slope tangent, equation morphing 3x² - 3 -> 3(x-1)(x+1) = 0, and concavity verification.",
+        notes="Play the continuous master animation. Tap video to pause and discuss any intermediate step with Apple Pencil."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 8: Signature Scene 1 Video - The Cubic Curve
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -715,7 +728,9 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     prs.save(output_pptx)
-    print(f"Presentation deck successfully created at: {output_pptx}")
+    import shutil
+    shutil.copy(output_pptx, "public/maxima_minima_lecture.pptx")
+    print(f"Presentation deck successfully created at: {output_pptx} and copied to public/")
 
 if __name__ == "__main__":
     create_deck()
