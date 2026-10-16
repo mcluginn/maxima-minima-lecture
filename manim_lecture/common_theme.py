@@ -17,6 +17,12 @@ MUTED_GRAY = "#94A3B8"  # Subtitles / Secondary annotations
 AXES_GRAY = "#475569"   # Coordinate grids and axes
 CARD_BG = "#111827"     # Dark Slate container background
 BORDER_GRAY = "#1E293B" # Subtle card borders
+CARD_BORDER = BORDER_GRAY
+TEXT_MUTED = MUTED_GRAY
+GREEN = "#10B981"
+BLUE_B = "#60A5FA"
+BLUE_D = "#1D4ED8"
+
 
 def create_header(title_text: str, subtitle_text: str, subtitle_color: str = CYAN) -> VGroup:
     """Creates a consistent, elegant lecture header banner."""

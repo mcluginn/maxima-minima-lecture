@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 .venv/
+.uv/
 venv/
 ENV/
 
@@ -10,6 +11,11 @@ ENV/
 media/Tex/
 media/texts/
 **/partial_movie_files/
+media/videos/mathalino_problems/
+media/videos/signature_sequence/
+media/videos/prototype_scenes/
+media/videos/broader_scenes/
+media/videos/test_text/
 media/test_deck.pptx
 
 # OS & Editor

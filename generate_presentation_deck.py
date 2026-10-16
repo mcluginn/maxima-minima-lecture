@@ -727,6 +727,180 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         "Remind students: Never neglect endpoints in engineering optimization."
     )
 
+    # -------------------------------------------------------------
+    # SLIDE 23: Mathalino Problem 1 - Number Optimization Video
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Mathalino Prob 1: Number Exceeding its Square",
+        video_path="media/videos/clips/MathalinoProblem1_NumberOptimization.mp4",
+        frame_path="media/frames/MathalinoProblem1_NumberOptimization_frame.png",
+        subtitle="What number exceeds its square by the maximum amount? (Source: mathalino.com)",
+        prompt_text="Objective f(x) = x - x². Differentiating f'(x) = 1 - 2x = 0 yields critical number x = 1/2. Concavity f''(x) = -2 < 0 proves strict global maximum of 1/4.",
+        notes="Mathalino Prob 1. Source: mathalino.com/reviewer/differential-calculus/01-04-number-problems-in-maxima-and-minima. Emphasize model definition, derivative test, and concavity."
+    )
+
+    # SLIDE 24: Mathalino Problem 1 - Annotation Workspace
+    add_annotation_slide(
+        prs,
+        title="Mathalino Prob 1: Modeling & Solution Workspace",
+        frame_path="media/frames/MathalinoProblem1_NumberOptimization_frame.png",
+        exercise_title="Number Optimization (Mathalino 01)",
+        instructions=[
+            "Define variable x as the unknown number.",
+            "Formulate objective function: f(x) = x - x².",
+            "Differentiate and find critical number: f'(x) = 1 - 2x = 0 => x = 1/2.",
+            "Verify with 2nd derivative: f''(1/2) = -2 < 0 (Maximum).",
+            "Calculate maximum excess value: f(1/2) = 1/4."
+        ],
+        pencil_prompts=[
+            "✍️ Write out the objective function f(x) and its derivative f'(x).",
+            "✍️ Solve for critical number and compute second derivative f''(x).",
+            "✍️ State final conclusion: number is 1/2, maximum excess is 1/4."
+        ],
+        notes="Instructor Guidance: Walk students through translating English problem statement into calculus objective function."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 25: Mathalino Problem 10 - Riverbank Fencing Video
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Mathalino Prob 10: Riverbank Fencing Optimization",
+        video_path="media/videos/clips/MathalinoProblem2_RiverbankLot.mp4",
+        frame_path="media/frames/MathalinoProblem2_RiverbankLot_frame.png",
+        subtitle="Least fencing perimeter for fixed area A along a riverbank (Source: mathalino.com)",
+        prompt_text="Area A = xy reduces perimeter P = x + 2y to single variable P(y) = A/y + 2y. Differentiating: dP/dy = -A/y² + 2 = 0 => 2y² = A = xy => Width y = x/2.",
+        notes="Mathalino Prob 10. Source: mathalino.com/reviewer/differential-calculus/09-11-rectangular-lot-problems-in-maxima-and-minima. Geometric constraint reduces multivariable to single variable. Optimal shape: width is half length."
+    )
+
+    # SLIDE 26: Mathalino Problem 10 - Annotation Workspace
+    add_annotation_slide(
+        prs,
+        title="Mathalino Prob 10: Fencing Constraint Workspace",
+        frame_path="media/frames/MathalinoProblem2_RiverbankLot_frame.png",
+        exercise_title="Riverbank Fencing (Mathalino 10)",
+        instructions=[
+            "Identify given constraint: Constant Area A = xy.",
+            "Express objective fence length: P = x + 2y (no fence along river).",
+            "Substitute x = A/y to obtain single-variable function P(y).",
+            "Differentiate dP/dy = -A/y² + 2 = 0 => 2y² = A.",
+            "Substitute A = xy: 2y² = xy => y = (1/2)x (width is half length)."
+        ],
+        pencil_prompts=[
+            "✍️ Sketch the riverbank and the 3-sided fence.",
+            "✍️ Substitute constraint x = A/y into P = x + 2y.",
+            "✍️ Differentiate and prove that optimal width y = (1/2)x."
+        ],
+        notes="Instructor Guidance: Contrast 3-sided fence (y = x/2) with traditional 4-sided enclosure (square x = y)."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 27: Mathalino Problem 16 - Open-Top Box Video
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Mathalino Prob 16: Open-Top Box Optimization",
+        video_path="media/videos/clips/MathalinoProblem3_OpenTopBox.mp4",
+        frame_path="media/frames/MathalinoProblem3_OpenTopBox_frame.png",
+        subtitle="15\" × 24\" Cardboard Sheet: Cut squares x to maximize Volume (Source: mathalino.com)",
+        prompt_text="V(x) = (24-2x)(15-2x)x = 4x³ - 78x² + 360x. Setting V'(x) = 0 yields x = 3 or x = 10. Feasible physical domain (0, 7.5) eliminates x = 10! V_max = 486 in³.",
+        notes="Mathalino Prob 16. Source: mathalino.com/reviewer/differential-calculus/15-17-box-open-at-the-top. Critical points must be tested against physical boundaries. x=10 is extraneous because 15-2(10) < 0."
+    )
+
+    # SLIDE 28: Mathalino Problem 16 - Annotation Workspace
+    add_annotation_slide(
+        prs,
+        title="Mathalino Prob 16: Domain Feasibility & Volume Workspace",
+        frame_path="media/frames/MathalinoProblem3_OpenTopBox_frame.png",
+        exercise_title="Open-Top Box Optimization (Mathalino 16)",
+        instructions=[
+            "Cardboard dimensions: 24'' by 15''. Corner cutout: x by x.",
+            "Folded dimensions: Length = 24 - 2x, Width = 15 - 2x, Height = x.",
+            "Objective: V(x) = 4x³ - 78x² + 360x.",
+            "Differentiate: V'(x) = 12(x² - 13x + 30) = 12(x - 3)(x - 10) = 0.",
+            "Physical domain check: 0 < x < 7.5''. Reject x = 10''.",
+            "Optimal cut x = 3''. V_max = (18)(9)(3) = 486 in³."
+        ],
+        pencil_prompts=[
+            "✍️ Write dimensions of folded box in terms of x.",
+            "✍️ Factor V'(x) = 0 and solve for critical numbers x = 3, 10.",
+            "✍️ Disqualify x = 10 using width constraint 15 - 2x > 0.",
+            "✍️ Compute maximum volume V(3) = 486 in³."
+        ],
+        notes="Instructor Guidance: Emphasize why domain inspection is mandatory in engineering optimization."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 29: Mathalino Problem 03 - Tour Bus Revenue Video
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Mathalino Prob 03: Tour Bus Maximum Revenue",
+        video_path="media/videos/clips/MathalinoProblem4_TourBusRevenue.mp4",
+        frame_path="media/frames/MathalinoProblem4_TourBusRevenue_frame.png",
+        subtitle="80-Seat Tour Bus: Balancing ticket price vs. demand drop (Source: mathalino.com)",
+        prompt_text="Base fare: P350/seat. Increments: P12.50/seat with -2 passengers. R(x) = (350 + 12.5x)(80 - 2x) = 28,000 + 300x - 25x². dR/dx = 0 => x = 6. Fare = P425, Revenue = P28,900 [Option C].",
+        notes="Mathalino Prob 03. Source: mathalino.com/reviewer/differential-calculus/03-maximum-revenue-tour-bus-80-seats. Real-world business revenue optimization. Matches Option C on Mathalino reviewer."
+    )
+
+    # SLIDE 30: Mathalino Problem 03 - Annotation Workspace
+    add_annotation_slide(
+        prs,
+        title="Mathalino Prob 03: Revenue Model Workspace",
+        frame_path="media/frames/MathalinoProblem4_TourBusRevenue_frame.png",
+        exercise_title="Tour Bus Revenue (Mathalino 03)",
+        instructions=[
+            "Base fare: P28,000 / 80 seats = P350 per passenger.",
+            "Increment per seat: P1,000 / 80 = P12.50 per passenger.",
+            "Let x = number of P1,000 package increments.",
+            "Price p(x) = 350 + 12.5x; Demand q(x) = 80 - 2x.",
+            "R(x) = 28,000 + 300x - 25x² => dR/dx = 300 - 50x = 0 => x = 6.",
+            "Optimal Fare: P425/seat; Passengers: 68; Max Revenue: P28,900."
+        ],
+        pencil_prompts=[
+            "✍️ Formulate price p(x) and quantity q(x) expressions.",
+            "✍️ Multiply to construct R(x) and differentiate dR/dx = 0.",
+            "✍️ Solve for x = 6 and evaluate optimal fare P425 and revenue P28,900."
+        ],
+        notes="Instructor Guidance: Show how calculus balances price elasticity against volume."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 31: Mathalino Problem 42 - Trapezoidal Gutter Video
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Mathalino Prob 42: Trapezoidal Gutter Capacity",
+        video_path="media/videos/clips/MathalinoProblem5_TrapezoidalGutter.mp4",
+        frame_path="media/frames/MathalinoProblem5_TrapezoidalGutter_frame.png",
+        subtitle="14-inch metal strip bent at 45°: Maximizing hydraulic carrying capacity (Source: mathalino.com)",
+        prompt_text="Base a, sides s = (14-a)/2, height h = (14-a)/(2√2). Cross-section Area A = ah + h². Setting dA/da = 0 yields optimal base width a = 14(√2 - 1)/(2√2 - 1) ≈ 3.17 inches (slants s ≈ 5.41 inches).",
+        notes="Mathalino Prob 42. Source: mathalino.com/reviewer/differential-calculus/41-42-maxima-and-minima-problem-involving-a-trapezoidal-gutter. Advanced engineering civil/mechanical optimization. Exact radical algebra simplified to decimal."
+    )
+
+    # SLIDE 32: Mathalino Problem 42 - Annotation Workspace
+    add_annotation_slide(
+        prs,
+        title="Mathalino Prob 42: Hydraulic Geometry Workspace",
+        frame_path="media/frames/MathalinoProblem5_TrapezoidalGutter_frame.png",
+        exercise_title="Trapezoidal Gutter (Mathalino 42)",
+        instructions=[
+            "Tin strip width = 14 inches. Base = a, two slant sides s = (14 - a)/2.",
+            "Bending angle θ = 45°. Height h = s sin 45° = (14 - a)/(2√2).",
+            "Area A = ah + h² = (14a - a²)/(2√2) + (14 - a)²/8.",
+            "Differentiate: dA/da = (7 - a)/√2 + (a - 14)/4 = 0.",
+            "Solve linear equation for a: a = 14(√2 - 1)/(2√2 - 1) ≈ 3.17 inches.",
+            "Compute slant sides: s = (14 - 3.17)/2 ≈ 5.41 inches."
+        ],
+        pencil_prompts=[
+            "✍️ Draw the cross-section trapezoid with base a, slants s, and height h.",
+            "✍️ Write cross-sectional area A in terms of base width a.",
+            "✍️ Differentiate dA/da = 0 and solve for base width a ≈ 3.17 inches."
+        ],
+        notes="Instructor Guidance: Demonstrate how civil and mechanical engineering channels are optimized for maximum flow."
+    )
+
     prs.save(output_pptx)
     import shutil
     shutil.copy(output_pptx, "public/maxima_minima_lecture.pptx")

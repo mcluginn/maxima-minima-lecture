@@ -311,10 +311,15 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         <option value="16">17. ✍️ Scene 16: Sign Chart Table Workspace</option>
         <option value="17">18. 🎬 Scene 17: Extrema Coordinates Reveal</option>
         <option value="18">19. 🎬 Scene 18: Second Derivative Concavity</option>
-        <option value="19">20. 20. 1st vs 2nd Test Comparison Matrix</option>
+        <option value="19">20. ⚖️ 1st vs 2nd Test Comparison Matrix</option>
         <option value="20">21. 🎬 Scene 21: Closed Interval EVT</option>
         <option value="21">22. 🎬 Scene 22: Max Power Transfer Circuit</option>
-        <option value="22">23. 23. Active Challenge & Exit Ticket</option>
+        <option value="22">23. 🎯 Active Challenge & Exit Ticket</option>
+        <option value="23">24. 📐 Mathalino 1: Number Exceeding Square</option>
+        <option value="24">25. 📐 Mathalino 10: Riverbank Fencing</option>
+        <option value="25">26. 📐 Mathalino 16: Open-Top Box Fold</option>
+        <option value="26">27. 📐 Mathalino 03: Tour Bus Maximum Revenue</option>
+        <option value="27">28. 📐 Mathalino 42: Trapezoidal Gutter Capacity</option>
       </select>
 
       <div style="display: flex; align-items: center; gap: 6px;">
@@ -343,7 +348,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide active" data-title="Title Slide">
         <div class="slide-top">
           <div class="meta">Differential Calculus for Engineering</div>
-          <div class="slide-num">Slide 01 / 23</div>
+          <div class="slide-num">Slide 01 / 28</div>
         </div>
         <div class="slide-body grid-full">
           <div class="card cyan-border" style="justify-content: center; align-items: center; text-align: center; padding: 40px;">
@@ -370,7 +375,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Lecture Trajectory">
         <div class="slide-top">
           <div><div class="meta">Pedagogical Arc</div><h1>Lecture Trajectory: From Kinetic Intuition to Proof</h1></div>
-          <div class="slide-num">Slide 02 / 23</div>
+          <div class="slide-num">Slide 02 / 28</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card cyan-border">
@@ -400,7 +405,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Terrain Exploration Hook" data-notes="Play video clip. Ask students: As the exploration probe traverses this mountain range, what exact instantaneous property characterizes the true summits and lowest valleys?">
         <div class="slide-top">
           <div><div class="meta">Phase 1 // Visual Motion</div><h1>Terrain Exploration: Peaks & Valleys</h1></div>
-          <div class="slide-num">Slide 03 / 23</div>
+          <div class="slide-num">Slide 03 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -428,7 +433,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Terrain Slope Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Tangent Equilibrium & Slope Incline</h1></div>
-          <div class="slide-num">Slide 04 / 23</div>
+          <div class="slide-num">Slide 04 / 28</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -450,7 +455,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Local vs Absolute Extrema">
         <div class="slide-top">
           <div><div class="meta">Phase 1 // Topological Foundations</div><h1>Local Extrema vs. Absolute Boundaries</h1></div>
-          <div class="slide-num">Slide 05 / 23</div>
+          <div class="slide-num">Slide 05 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -478,7 +483,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Neighborhood Test Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>The Neighborhood Test & Boundary Caps</h1></div>
-          <div class="slide-num">Slide 06 / 23</div>
+          <div class="slide-num">Slide 06 / 28</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -500,11 +505,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="🌟 MASTER SEQUENCE (Continuous Movie)" data-notes="This is the seamless 24-second master transformation of f(x) = x³ - 3x. It flows uninterrupted across function tracing, dynamic slope telemetry, algebraic factoring morph, drop lines, and concavity verification!">
         <div class="slide-top">
           <div><div class="meta" style="color: var(--amber);">Continuous Mathematical Journey // 3Blue1Brown Style</div><h1>Unified Master Transformation: f(x) = x³ - 3x</h1></div>
-          <div class="slide-num">Slide 07 / 23</div>
+          <div class="slide-num">Slide 07 / 28</div>
         </div>
         <div class="slide-body grid-master">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
-            <video autoplay muted playsinline preload="auto">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureSequenceMaster_frame.png">
               <source src="media/videos/clips/SignatureSequenceMaster.mp4" type="video/mp4">
             </video>
             <div class="play-pause-indicator">Tap anywhere to Pause / Play</div>
@@ -534,7 +539,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="The Cubic Function Curve">
         <div class="slide-top">
           <div><div class="meta">Signature Sequence // Deep Dive</div><h1>The Cubic Function: f(x) = x³ - 3x</h1></div>
-          <div class="slide-num">Slide 08 / 23</div>
+          <div class="slide-num">Slide 08 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -561,7 +566,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Dynamic Tangent Telemetry">
         <div class="slide-top">
           <div><div class="meta">Signature Sequence // Deep Dive</div><h1>Dynamic Tangent Line & Slope Telemetry</h1></div>
-          <div class="slide-num">Slide 09 / 23</div>
+          <div class="slide-num">Slide 09 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -591,7 +596,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Power Rule Derivation Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Derivative Derivation & Instantaneous Velocity</h1></div>
-          <div class="slide-num">Slide 10 / 23</div>
+          <div class="slide-num">Slide 10 / 28</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -613,7 +618,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Singularities (Corners & Cusps)">
         <div class="slide-top">
           <div><div class="meta">Singularities // Critical Points</div><h1>When Derivatives Fail: Corners & Cusps</h1></div>
-          <div class="slide-num">Slide 11 / 23</div>
+          <div class="slide-num">Slide 11 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -640,7 +645,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Singularity Limits DNE Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Difference Quotient Singularity Proof</h1></div>
-          <div class="slide-num">Slide 12 / 23</div>
+          <div class="slide-num">Slide 12 / 28</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -662,7 +667,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Critical Trap g(x)=x³ Terrace">
         <div class="slide-top">
           <div><div class="meta">Counterexample // The Critical Trap</div><h1>The Critical Trap: g(x) = x³ Inflection Terrace</h1></div>
-          <div class="slide-num">Slide 13 / 23</div>
+          <div class="slide-num">Slide 13 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -690,7 +695,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Necessary vs Sufficient Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Logical Implication: Necessary vs. Sufficient</h1></div>
-          <div class="slide-num">Slide 14 / 23</div>
+          <div class="slide-num">Slide 14 / 28</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -712,7 +717,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Equation Factoring Morph">
         <div class="slide-top">
           <div><div class="meta">Signature Sequence // TransformMatchingTex</div><h1>Algebraic Morphing: Factoring the Derivative</h1></div>
-          <div class="slide-num">Slide 15 / 23</div>
+          <div class="slide-num">Slide 15 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -744,7 +749,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="First Derivative Test Sign Chart">
         <div class="slide-top">
           <div><div class="meta">First Derivative Test // Interval Signs</div><h1>First Derivative Test: Dynamic Sign Chart</h1></div>
-          <div class="slide-num">Slide 16 / 23</div>
+          <div class="slide-num">Slide 16 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -773,7 +778,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Sign Chart Table Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Constructing the Derivative Sign Table</h1></div>
-          <div class="slide-num">Slide 17 / 23</div>
+          <div class="slide-num">Slide 17 / 28</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -796,7 +801,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Extrema Coordinates Reveal">
         <div class="slide-top">
           <div><div class="meta">Extrema Coordinates // Function Evaluation</div><h1>Exact Extrema Coordinates: (-1, 2) & (1, -2)</h1></div>
-          <div class="slide-num">Slide 18 / 23</div>
+          <div class="slide-num">Slide 18 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -826,7 +831,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Second Derivative & Concavity">
         <div class="slide-top">
           <div><div class="meta">Second Derivative // Curvature Bending</div><h1>Second Derivative Test & Concavity Bending</h1></div>
-          <div class="slide-num">Slide 19 / 23</div>
+          <div class="slide-num">Slide 19 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -856,7 +861,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="1st vs 2nd Test Comparison">
         <div class="slide-top">
           <div><div class="meta">Comparative Analysis // Decision Logic</div><h1>Extrema Decision Matrix: 1st vs. 2nd Test</h1></div>
-          <div class="slide-num">Slide 20 / 23</div>
+          <div class="slide-num">Slide 20 / 28</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card cyan-border">
@@ -894,7 +899,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Closed Interval EVT">
         <div class="slide-top">
           <div><div class="meta">Optimization Theory // Closed Domain</div><h1>Closed Interval Method & Candidate Matrix</h1></div>
-          <div class="slide-num">Slide 21 / 23</div>
+          <div class="slide-num">Slide 21 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -923,7 +928,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Engineering: Maximum Power Transfer">
         <div class="slide-top">
           <div><div class="meta">Engineering Application // Circuits</div><h1>Maximum Power Transfer Theorem</h1></div>
-          <div class="slide-num">Slide 22 / 23</div>
+          <div class="slide-num">Slide 22 / 28</div>
         </div>
         <div class="slide-body grid-video">
           <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
@@ -952,7 +957,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <div class="slide" data-title="Practice Problem & Exit Ticket">
         <div class="slide-top">
           <div><div class="meta">Active Learning // Exit Challenge</div><h1>Practice Challenge & Verification Key</h1></div>
-          <div class="slide-num">Slide 23 / 23</div>
+          <div class="slide-num">Slide 23 / 28</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card amber-border">
@@ -990,6 +995,158 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
+      <!-- SLIDE 24: Mathalino Problem 1 Number Optimization -->
+      <div class="slide" data-title="Mathalino 1: Number Optimization" data-notes="Mathalino Problem 1. Source: mathalino.com. Walk through defining x, objective f(x) = x - x², critical number x = 1/2, and second derivative f''(x) = -2 proving maximum excess 1/4.">
+        <div class="slide-top">
+          <div><div class="meta">Mathalino Reviewer // Number Optimization</div><h1>Mathalino Prob 1: Number Exceeding its Square</h1></div>
+          <div class="slide-num">Slide 24 / 28</div>
+        </div>
+        <div class="slide-body grid-video">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/MathalinoProblem1_NumberOptimization_frame.png">
+              <source src="media/videos/clips/MathalinoProblem1_NumberOptimization.mp4" type="video/mp4">
+            </video>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
+          </div>
+          <div class="card amber-border">
+            <h3 style="color: var(--amber); margin-bottom: 8px;">SOURCE: MATHALINO PROB 1</h3>
+            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">What number exceeds its square by maximum amount?</p>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+              • <strong>Objective:</strong> f(x) = x - x²<br>
+              • <strong>Derivative:</strong> f'(x) = 1 - 2x = 0 ⟹ <strong>x = 1/2</strong><br>
+              • <strong>Concavity:</strong> f''(x) = -2 &lt; 0 ⟹ <strong>Strict Maximum</strong><br>
+              • <strong>Max Excess:</strong> f(1/2) = 1/2 - 1/4 = <strong>1/4</strong> (0.25)
+            </p>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
+              <div style="color: var(--amber); font-weight: 700; font-size: 11px;">MODELING FOUNDATION</div>
+              <div style="color: #fff; font-size: 12px; margin-top: 4px;">Translating natural language into an analytical objective function.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 25: Mathalino Problem 10 Riverbank Lot -->
+      <div class="slide" data-title="Mathalino 10: Riverbank Fencing" data-notes="Mathalino Problem 10. Source: mathalino.com. Area A = xy is constant. Perimeter P = x + 2y. Differentiating dP/dy = -A/y² + 2 = 0 yields 2y² = A = xy => width y is half of length x.">
+        <div class="slide-top">
+          <div><div class="meta">Mathalino Reviewer // Geometric Constraints</div><h1>Mathalino Prob 10: Riverbank Fencing Optimization</h1></div>
+          <div class="slide-num">Slide 25 / 28</div>
+        </div>
+        <div class="slide-body grid-video">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/MathalinoProblem2_RiverbankLot_frame.png">
+              <source src="media/videos/clips/MathalinoProblem2_RiverbankLot.mp4" type="video/mp4">
+            </video>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
+          </div>
+          <div class="card cyan-border">
+            <h3 style="color: var(--cyan); margin-bottom: 8px;">SOURCE: MATHALINO PROB 10</h3>
+            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Least fencing for fixed area along a river</p>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+              • <strong>Constraint:</strong> Area A = xy ⟹ x = A / y<br>
+              • <strong>Fence Perimeter:</strong> P = x + 2y = A/y + 2y<br>
+              • <strong>Differentiation:</strong> dP/dy = -A/y² + 2 = 0 ⟹ 2y² = A<br>
+              • <strong>Optimal Proportions:</strong> 2y² = xy ⟹ <strong>y = ½x</strong> (Width = ½ Length)
+            </p>
+            <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);">
+              <div style="color: var(--cyan); font-weight: 700; font-size: 11px;">BOUNDARY REDUCTION</div>
+              <div style="color: #fff; font-size: 12px; margin-top: 4px;">With 1 natural boundary (river), the optimal rectangular ratio shifts from 1:1 to 2:1.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 26: Mathalino Problem 16 Open-Top Box -->
+      <div class="slide" data-title="Mathalino 16: Open-Top Box" data-notes="Mathalino Problem 16. Source: mathalino.com. Sheet 15'' x 24''. Cut corner x. Volume V(x) = (24-2x)(15-2x)x = 4x³ - 78x² + 360x. V'(x)=0 gives x=3 or x=10. Domain (0, 7.5) rejects x=10. V_max = 486 in³.">
+        <div class="slide-top">
+          <div><div class="meta">Mathalino Reviewer // Domain Feasibility</div><h1>Mathalino Prob 16: Open-Top Box Optimization</h1></div>
+          <div class="slide-num">Slide 26 / 28</div>
+        </div>
+        <div class="slide-body grid-video">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/MathalinoProblem3_OpenTopBox_frame.png">
+              <source src="media/videos/clips/MathalinoProblem3_OpenTopBox.mp4" type="video/mp4">
+            </video>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
+          </div>
+          <div class="card amber-border">
+            <h3 style="color: var(--amber); margin-bottom: 8px;">SOURCE: MATHALINO PROB 16</h3>
+            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Cardboard 15" × 24": Maximize Folded Volume</p>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+              • <strong>Volume:</strong> V(x) = 4x³ - 78x² + 360x<br>
+              • <strong>Criticals:</strong> 12(x - 3)(x - 10) = 0 ⟹ x = 3, 10<br>
+              • <strong>Domain Feasibility:</strong> 0 &lt; x &lt; 7.5'' ⟹ <span style="color: var(--coral); font-weight: 700;">Discard x = 10''</span><br>
+              • <strong>Max Volume:</strong> V(3) = 18 × 9 × 3 = <strong>486 in³</strong>
+            </p>
+            <div style="background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
+              <div style="color: var(--amber); font-weight: 700; font-size: 11px;">EXTRANEOUS CRITICAL DISCOVERY</div>
+              <div style="color: #fff; font-size: 12px; margin-top: 4px;">x = 10 produces a negative width 15 - 20 = -5'', highlighting why domain check is critical.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 27: Mathalino Problem 03 Tour Bus Revenue -->
+      <div class="slide" data-title="Mathalino 03: Tour Bus Revenue" data-notes="Mathalino Problem 03. Source: mathalino.com. Base fare P350, increments P12.50, passenger drop 2 per step. R(x) = (350+12.5x)(80-2x) = 28000 + 300x - 25x². dR/dx = 300 - 50x = 0 => x = 6. Fare = P425, Passengers = 68, Max Revenue = P28,900 (Option C).">
+        <div class="slide-top">
+          <div><div class="meta">Mathalino Reviewer // Applied Economics</div><h1>Mathalino Prob 03: Tour Bus Maximum Revenue</h1></div>
+          <div class="slide-num">Slide 27 / 28</div>
+        </div>
+        <div class="slide-body grid-video">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/MathalinoProblem4_TourBusRevenue_frame.png">
+              <source src="media/videos/clips/MathalinoProblem4_TourBusRevenue.mp4" type="video/mp4">
+            </video>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
+          </div>
+          <div class="card green-border">
+            <h3 style="color: var(--green); margin-bottom: 8px;">SOURCE: MATHALINO PROB 03</h3>
+            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">80-Seat Tour Bus: Balancing Fare vs. Demand</p>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+              • <strong>Price per Seat:</strong> p(x) = 350 + 12.5x<br>
+              • <strong>Seats Sold:</strong> q(x) = 80 - 2x<br>
+              • <strong>Revenue Function:</strong> R(x) = 28,000 + 300x - 25x²<br>
+              • <strong>Calculus Solution:</strong> dR/dx = 300 - 50x = 0 ⟹ <strong>x = 6</strong><br>
+              • <strong>Optimal Metrics:</strong> Fare = <strong>P425/seat</strong>, <strong>68 seats</strong> ⟹ <strong>P28,900</strong> [Option C]
+            </p>
+            <div style="background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(34, 197, 94, 0.3);">
+              <div style="color: var(--green); font-weight: 700; font-size: 11px;">REVENUE MAXIMIZATION</div>
+              <div style="color: #fff; font-size: 12px; margin-top: 4px;">Exact verification of Mathalino Multiple-Choice Reviewer Option C.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 28: Mathalino Problem 42 Trapezoidal Gutter -->
+      <div class="slide" data-title="Mathalino 42: Trapezoidal Gutter" data-notes="Mathalino Problem 42. Source: mathalino.com. 14'' tin strip bent at 45°. Base a, slants s = (14-a)/2, height h = (14-a)/(2√2). Cross-section Area A = ah + h². Setting dA/da = 0 yields base a = 14(√2 - 1)/(2√2 - 1) ≈ 3.17 inches.">
+        <div class="slide-top">
+          <div><div class="meta">Mathalino Reviewer // Hydraulic Engineering</div><h1>Mathalino Prob 42: Trapezoidal Gutter Capacity</h1></div>
+          <div class="slide-num">Slide 28 / 28</div>
+        </div>
+        <div class="slide-body grid-video">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/MathalinoProblem5_TrapezoidalGutter_frame.png">
+              <source src="media/videos/clips/MathalinoProblem5_TrapezoidalGutter.mp4" type="video/mp4">
+            </video>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
+          </div>
+          <div class="card coral-border">
+            <h3 style="color: var(--coral); margin-bottom: 8px;">SOURCE: MATHALINO PROB 42</h3>
+            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">14" Tin Strip at 45°: Maximize Cross-Section Area</p>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
+              • <strong>Strip Width:</strong> a + 2s = 14 ⟹ s = (14 - a)/2<br>
+              • <strong>Gutter Depth:</strong> h = s sin 45° = (14 - a) / (2√2)<br>
+              • <strong>Area:</strong> A(a) = ah + h² = (14a - a²)/(2√2) + (14 - a)²/8<br>
+              • <strong>Derivative:</strong> dA/da = (7 - a)/√2 + (a - 14)/4 = 0<br>
+              • <strong>Optimal Base:</strong> a = 14(√2 - 1)/(2√2 - 1) ≈ <strong>3.17 inches</strong> (slants s ≈ 5.41")
+            </p>
+            <div style="background: rgba(244, 63, 94, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(244, 63, 94, 0.3);">
+              <div style="color: var(--coral); font-weight: 700; font-size: 11px;">CIVIL & HYDRAULIC OPTIMIZATION</div>
+              <div style="color: #fff; font-size: 12px; margin-top: 4px;">Exact closed-form radical solution for open-channel fluid flow.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Floating Teleprompter -->
@@ -1002,7 +1159,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <footer>
     <button id="prevBtn">◀ Previous</button>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <span id="slideIndicator" style="font-weight: 600; color: var(--muted); min-width: 90px; text-align: center;">01 / 23</span>
+    <span id="slideIndicator" style="font-weight: 600; color: var(--muted); min-width: 90px; text-align: center;">01 / 28</span>
     <button id="nextBtn">Next ▶</button>
   </footer>
 
