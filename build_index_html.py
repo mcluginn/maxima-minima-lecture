@@ -1,24 +1,21 @@
 """
 build_index_html.py
-Builds the definitive, high-performance HTML5 presentation player at root index.html
-and public/index.html, featuring automatic Manim video playback, scene selector,
-Apple Pencil inking, and Keynote downloads.
+Builds the definitive, seamless, Keynote-grade presentation player.
+No video borders, no player chrome, smooth 0.4s cinematic crossfades,
+automatic playback on slide arrival, and seamless Apple Pencil inking.
 """
-
-import os
-import shutil
 
 HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Maxima & Minima — Motion-Based Engineering Calculus (ManimCE)</title>
+  <title>Maxima & Minima — Motion-Based Engineering Calculus</title>
   <style>
     :root {
       --bg: #0B0F19;
-      --card-bg: #131B2E;
-      --card-border: #334155;
+      --card-bg: rgba(19, 27, 46, 0.7);
+      --card-border: rgba(51, 65, 85, 0.5);
       --cyan: #38BDF8;
       --amber: #F59E0B;
       --coral: #F43F5E;
@@ -35,12 +32,16 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       height: 100vh;
       display: flex;
       flex-direction: column;
+      user-select: none;
+      -webkit-user-select: none;
     }
+
+    /* Minimalist Top Control Bar */
     header {
-      height: 56px;
-      background: rgba(19, 27, 46, 0.95);
-      backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--card-border);
+      height: 52px;
+      background: rgba(11, 15, 25, 0.9);
+      backdrop-filter: blur(16px);
+      border-bottom: 1px solid rgba(51, 65, 85, 0.4);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -50,24 +51,21 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     .brand {
       display: flex;
       align-items: center;
-      gap: 12px;
-      font-size: 14px;
+      gap: 10px;
+      font-size: 13.5px;
       font-weight: 600;
+      letter-spacing: 0.3px;
     }
     .badge {
-      background: rgba(56, 189, 248, 0.15);
+      background: rgba(56, 189, 248, 0.12);
       color: var(--cyan);
-      border: 1px solid rgba(56, 189, 248, 0.4);
+      border: 1px solid rgba(56, 189, 248, 0.35);
       padding: 3px 8px;
-      border-radius: 6px;
-      font-size: 11px;
+      border-radius: 5px;
+      font-size: 10.5px;
       font-weight: 700;
       text-transform: uppercase;
-    }
-    .badge-amber {
-      background: rgba(245, 158, 11, 0.15);
-      color: var(--amber);
-      border: 1px solid rgba(245, 158, 11, 0.4);
+      letter-spacing: 0.5px;
     }
     .controls {
       display: flex;
@@ -75,75 +73,91 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       gap: 8px;
     }
     button, select {
-      background: var(--card-bg);
+      background: rgba(19, 27, 46, 0.8);
       border: 1px solid var(--card-border);
       color: var(--text);
       padding: 6px 12px;
       border-radius: 6px;
-      font-size: 13px;
+      font-size: 12.5px;
       cursor: pointer;
       display: flex;
       align-items: center;
       gap: 6px;
-      transition: all 0.2s ease;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       touch-action: manipulation;
     }
     button:hover, select:hover { background: #1E293B; border-color: var(--cyan); color: var(--cyan); }
-    button.active { background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: var(--cyan); }
+    button.active { background: rgba(56, 189, 248, 0.25); border-color: var(--cyan); color: var(--cyan); font-weight: 600; }
     button.danger:hover { border-color: var(--coral); color: var(--coral); }
     select { outline: none; }
-    
+
+    /* Main Presentation Canvas (16:9 Widescreen) */
     .main-stage {
       flex: 1;
       position: relative;
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 16px;
+      padding: 12px;
+      background: radial-gradient(circle at 50% 30%, rgba(19, 27, 46, 0.5) 0%, #0B0F19 80%);
     }
     .slide-container {
       width: 100%;
-      max-width: 1320px;
+      max-width: 1360px;
       height: 100%;
-      max-height: 742px;
+      max-height: 765px;
       aspect-ratio: 16 / 9;
       background: var(--bg);
       border-radius: 12px;
-      border: 1px solid var(--card-border);
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
       position: relative;
       overflow: hidden;
-      display: flex;
-      flex-direction: column;
+      box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85);
+      border: 1px solid rgba(51, 65, 85, 0.3);
     }
+
+    /* Seamless Keynote-Style Slide Crossfade */
     .slide {
-      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      padding: 24px 32px;
+      padding: 24px 36px;
+      display: flex;
       flex-direction: column;
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.99);
+      transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1), transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 10;
     }
-    .slide.active { display: flex; }
-    
+    .slide.active {
+      opacity: 1;
+      pointer-events: auto;
+      transform: scale(1.0);
+      z-index: 20;
+    }
+
     .slide-top {
-      margin-bottom: 14px;
+      margin-bottom: 12px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(51, 65, 85, 0.35);
+      padding-bottom: 8px;
     }
-    .slide-top .meta { font-size: 11px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; }
-    .slide-top h1 { font-size: 22px; font-weight: 700; color: #fff; margin-top: 2px; }
-    .slide-top .slide-num { font-size: 13px; color: var(--muted); font-weight: 600; }
+    .slide-top .meta { font-size: 11px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 1.5px; }
+    .slide-top h1 { font-size: 23px; font-weight: 700; color: #fff; margin-top: 3px; letter-spacing: -0.2px; }
+    .slide-top .slide-num { font-size: 13px; color: var(--muted); font-weight: 600; font-variant-numeric: tabular-nums; }
 
     .slide-body {
       flex: 1;
       display: grid;
-      gap: 16px;
+      gap: 20px;
       overflow: hidden;
     }
-    .grid-video { grid-template-columns: 2fr 1fr; }
+    .grid-video { grid-template-columns: 1.85fr 1fr; }
+    .grid-master { grid-template-columns: 2.2fr 1fr; }
     .grid-annotate { grid-template-columns: 1fr 1fr; }
     .grid-equal { grid-template-columns: 1fr 1fr; }
     .grid-full { grid-template-columns: 1fr; }
@@ -152,42 +166,57 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 18px;
+      padding: 20px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
+      backdrop-filter: blur(8px);
     }
-    .card.cyan-border { border-color: rgba(56, 189, 248, 0.5); }
-    .card.amber-border { border-color: rgba(245, 158, 11, 0.5); }
-    .card.coral-border { border-color: rgba(244, 63, 94, 0.5); }
+    .card.cyan-border { border-color: rgba(56, 189, 248, 0.45); }
+    .card.amber-border { border-color: rgba(245, 158, 11, 0.45); }
+    .card.coral-border { border-color: rgba(244, 63, 94, 0.45); }
+    .card.green-border { border-color: rgba(34, 197, 94, 0.45); }
 
-    .video-wrapper {
+    /* Seamless Edge-to-Edge Video Canvas: ZERO UGLY BORDERS */
+    .seamless-video-canvas {
       position: relative;
       width: 100%;
       height: 100%;
+      background: #0B0F19;
       border-radius: 8px;
       overflow: hidden;
-      background: #000;
-      border: 1px solid rgba(56, 189, 248, 0.4);
-      display: flex;
-      flex-direction: column;
-    }
-    video { width: 100%; height: calc(100% - 38px); object-fit: contain; background: #0B0F19; }
-    .video-toolbar {
-      height: 38px;
-      background: rgba(15, 23, 42, 0.95);
-      border-top: 1px solid var(--card-border);
+      cursor: pointer;
       display: flex;
       align-items: center;
-      justify-content: space-between;
-      padding: 0 12px;
-      font-size: 11px;
+      justify-content: center;
     }
-    .video-toolbar button { padding: 3px 8px; font-size: 11px; }
+    .seamless-video-canvas video {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #0B0F19;
+      pointer-events: none; /* Allows click-to-pause on container */
+    }
+    .play-pause-indicator {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      background: rgba(11, 15, 25, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 4px 10px;
+      font-size: 11px;
+      color: var(--muted);
+      backdrop-filter: blur(8px);
+      opacity: 0;
+      transition: opacity 0.25s ease;
+      pointer-events: none;
+    }
+    .seamless-video-canvas:hover .play-pause-indicator { opacity: 1; }
 
     img.frame-ref { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
 
-    /* Canvas Drawing Overlay */
+    /* Apple Pencil Drawing Canvas Overlay */
     #pencilCanvas {
       position: absolute;
       top: 0;
@@ -202,38 +231,39 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     /* Teleprompter Drawer */
     .teleprompter {
       position: absolute;
-      bottom: 60px;
-      right: 20px;
+      bottom: 56px;
+      right: 16px;
       width: 380px;
       max-height: 280px;
       background: rgba(19, 27, 46, 0.95);
       border: 1px solid var(--cyan);
       border-radius: 10px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.6);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
       padding: 16px;
       z-index: 90;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
       display: none;
       overflow-y: auto;
       font-size: 13px;
       line-height: 1.5;
     }
-    .teleprompter h4 { color: var(--amber); margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
+    .teleprompter h4 { color: var(--amber); margin-bottom: 8px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; }
 
     .color-dot {
-      width: 18px;
-      height: 18px;
+      width: 17px;
+      height: 17px;
       border-radius: 50%;
       cursor: pointer;
       border: 2px solid transparent;
       transition: transform 0.15s ease;
     }
-    .color-dot.active { transform: scale(1.2); border-color: #fff; }
+    .color-dot.active { transform: scale(1.25); border-color: #fff; }
 
+    /* Footer Navigation */
     footer {
-      height: 48px;
-      background: var(--card-bg);
-      border-top: 1px solid var(--card-border);
+      height: 46px;
+      background: rgba(11, 15, 25, 0.9);
+      border-top: 1px solid rgba(51, 65, 85, 0.4);
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -243,47 +273,48 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     .progress-bar {
       flex: 1;
       height: 4px;
-      background: #1E293B;
+      background: rgba(30, 41, 59, 0.8);
       margin: 0 20px;
       border-radius: 2px;
       overflow: hidden;
     }
-    .progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: width 0.3s ease; }
+    .progress-fill { height: 100%; background: var(--cyan); width: 0%; transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">
-      <span class="badge">ManimCE 3Blue1Brown Engine</span>
+      <span class="badge">Seamless Mode</span>
       <span>Calculus: Maxima & Minima</span>
     </div>
 
     <div class="controls">
-      <!-- Quick Scene Navigator -->
-      <select id="sceneNav" title="Jump directly to any scene">
-        <option value="0">01. Title & Intro</option>
+      <!-- Quick Scene Dropdown -->
+      <select id="sceneNav" title="Jump to any scene">
+        <option value="0">01. Title & Overview</option>
         <option value="1">02. 4-Phase Roadmap</option>
-        <option value="2">03. 🎬 Scene 1: Terrain Hook (Video)</option>
-        <option value="3">04. ✍️ Scene 1: Terrain Slope Scratchpad</option>
-        <option value="4">05. 🎬 Scene 2: Local vs Absolute (Video)</option>
-        <option value="5">06. ✍️ Scene 2: Neighborhood Test Scratchpad</option>
-        <option value="6">07. 🎬 Scene 7: Cubic Curve f(x)=x³-3x (Video)</option>
-        <option value="7">08. 🎬 Scene 8: Dynamic Tangent Telemetry (Video)</option>
-        <option value="8">09. ✍️ Scene 8: Tangent Power Rule Scratchpad</option>
-        <option value="9">10. 🎬 Scene 10: Singularities Corners/Cusps (Video)</option>
-        <option value="10">11. ✍️ Scene 10: Difference Quotient DNE Scratchpad</option>
-        <option value="11">12. 🎬 Scene 12: Critical Trap g(x)=x³ Terrace (Video)</option>
-        <option value="12">13. ✍️ Scene 12: Necessary vs Sufficient Scratchpad</option>
-        <option value="13" selected>14. 🎬 Scene 14: Equation Morphing (Video)</option>
-        <option value="14">15. 🎬 Scene 15: First Derivative Sign Chart (Video)</option>
-        <option value="15">16. ✍️ Scene 16: Sign Chart Table Scratchpad</option>
-        <option value="16">17. 🎬 Scene 17: Extrema Coordinates Reveal (Video)</option>
-        <option value="17">18. 🎬 Scene 18: Second Derivative Concavity (Video)</option>
-        <option value="18">19. 19. 1st vs 2nd Test Comparison Matrix</option>
-        <option value="19">20. 🎬 Scene 20: Closed Interval EVT (Video)</option>
-        <option value="20">21. 🎬 Scene 21: Max Power Transfer Circuit (Video)</option>
-        <option value="21">22. 22. Active Challenge & Exit Ticket</option>
+        <option value="2">03. 🎬 Scene 1: Terrain Hook</option>
+        <option value="3">04. ✍️ Scene 1: Terrain Slope Workspace</option>
+        <option value="4">05. 🎬 Scene 2: Local vs Absolute Extrema</option>
+        <option value="5">06. ✍️ Scene 2: Neighborhood Test Workspace</option>
+        <option value="6">07. 🌟 MASTER SEQUENCE (Full Continuous Story)</option>
+        <option value="7">08. 🎬 Scene 7: The Cubic Curve Landscape</option>
+        <option value="8">09. 🎬 Scene 8: Dynamic Tangent Telemetry</option>
+        <option value="9">10. ✍️ Scene 8: Power Rule Derivation Workspace</option>
+        <option value="10">11. 🎬 Scene 10: Singularities (Corners & Cusps)</option>
+        <option value="11">12. ✍️ Scene 10: Singularity Limits DNE Workspace</option>
+        <option value="12">13. 🎬 Scene 12: Critical Trap g(x)=x³ Terrace</option>
+        <option value="13">14. ✍️ Scene 12: Necessary vs Sufficient Workspace</option>
+        <option value="14">15. 🎬 Scene 14: Equation Factoring Morph</option>
+        <option value="15">16. 🎬 Scene 15: First Derivative Sign Chart</option>
+        <option value="16">17. ✍️ Scene 16: Sign Chart Table Workspace</option>
+        <option value="17">18. 🎬 Scene 17: Extrema Coordinates Reveal</option>
+        <option value="18">19. 🎬 Scene 18: Second Derivative Concavity</option>
+        <option value="19">20. 20. 1st vs 2nd Test Comparison Matrix</option>
+        <option value="20">21. 🎬 Scene 21: Closed Interval EVT</option>
+        <option value="21">22. 🎬 Scene 22: Max Power Transfer Circuit</option>
+        <option value="22">23. 23. Active Challenge & Exit Ticket</option>
       </select>
 
       <div style="display: flex; align-items: center; gap: 6px;">
@@ -296,7 +327,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       </div>
 
       <a href="maxima_minima_lecture.pptx" download style="text-decoration:none;">
-        <button style="background: rgba(34, 197, 94, 0.2); border-color: var(--green); color: var(--green);" title="Download Keynote/PowerPoint Deck">📥 Keynote (.pptx)</button>
+        <button style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.4); color: var(--green);" title="Download Keynote/PowerPoint Deck">📥 Keynote (.pptx)</button>
       </a>
 
       <button id="notesBtn" title="Toggle Lecturer Teleprompter">📋 Notes</button>
@@ -311,26 +342,24 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <!-- SLIDE 1: Title -->
       <div class="slide active" data-title="Title Slide">
         <div class="slide-top">
-          <div class="meta">Engineering Differential Calculus // Motion Series</div>
-          <div class="slide-num">Slide 01 / 22</div>
+          <div class="meta">Differential Calculus for Engineering</div>
+          <div class="slide-num">Slide 01 / 23</div>
         </div>
         <div class="slide-body grid-full">
-          <div class="card cyan-border" style="justify-content: center; align-items: center; text-align: center; padding: 36px;">
+          <div class="card cyan-border" style="justify-content: center; align-items: center; text-align: center; padding: 40px;">
             <div style="font-size: 13px; font-weight: 700; color: var(--cyan); letter-spacing: 2px; margin-bottom: 12px;">CALCULUS IN MOTION</div>
-            <h1 style="font-size: 38px; color: #fff; line-height: 1.2; margin-bottom: 16px;">Maxima & Minima</h1>
-            <h3 style="font-size: 20px; color: var(--amber); margin-bottom: 24px; font-weight: 500;">Dynamic Motion, Extrema Tests & Engineering Optimization</h3>
-            <p style="max-width: 720px; color: var(--muted); font-size: 14.5px; line-height: 1.6;">
-              A mathematical motion lecture inspired by 3Blue1Brown, featuring genuine Manim Community Edition vector animations,
-              continuous tangent slope telemetry, concavity bending, and real-time Apple Pencil derivation workspaces.
+            <h1 style="font-size: 40px; color: #fff; line-height: 1.2; margin-bottom: 14px;">Maxima & Minima</h1>
+            <h3 style="font-size: 20px; color: var(--amber); margin-bottom: 24px; font-weight: 500;">Kinematic Visual Storytelling & Engineering Optimization</h3>
+            <p style="max-width: 720px; color: var(--muted); font-size: 15px; line-height: 1.6;">
+              Experience differential calculus through continuous 3Blue1Brown-inspired vector animations.
+              Watch equations physically morph, tangent vectors rotate in real time, and concavity bowls verify extrema.
             </p>
             <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;">
-              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--amber); border-color: rgba(245, 158, 11, 0.4);">Core Model: f(x) = x³ - 3x</span>
-              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--cyan); border-color: rgba(56, 189, 248, 0.4);">Factoring Morphing via TransformMatchingTex</span>
-              <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: var(--green); border-color: rgba(34, 197, 94, 0.4);">Circuit: Maximum Power Transfer</span>
-            </div>
-            <div style="margin-top: 24px;">
-              <button onclick="showSlide(13)" style="background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: var(--cyan); font-weight: 700; padding: 10px 20px; font-size: 14px;">
-                ⚡ Jump Straight to Equation Morphing Animation (Slide 14) ➔
+              <button onclick="showSlide(6)" style="background: rgba(56, 189, 248, 0.25); border-color: var(--cyan); color: var(--cyan); font-weight: 700; padding: 10px 22px; font-size: 14px;">
+                🌟 Watch Full Master Sequence (Continuous Movie) ➔
+              </button>
+              <button onclick="showSlide(14)" style="background: rgba(245, 158, 11, 0.2); border-color: var(--amber); color: var(--amber); font-weight: 700; padding: 10px 22px; font-size: 14px;">
+                ⚡ Jump to Equation Morphing (Slide 15) ➔
               </button>
             </div>
           </div>
@@ -340,8 +369,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <!-- SLIDE 2: Roadmap -->
       <div class="slide" data-title="Lecture Trajectory">
         <div class="slide-top">
-          <div><div class="meta">Pedagogical Arc</div><h1>Lecture Trajectory: From Intuition to Proof</h1></div>
-          <div class="slide-num">Slide 02 / 22</div>
+          <div><div class="meta">Pedagogical Arc</div><h1>Lecture Trajectory: From Kinetic Intuition to Proof</h1></div>
+          <div class="slide-num">Slide 02 / 23</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card cyan-border">
@@ -370,18 +399,15 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       <!-- SLIDE 3: Hook Hill Video -->
       <div class="slide" data-title="Terrain Exploration Hook" data-notes="Play video clip. Ask students: As the exploration probe traverses this mountain range, what exact instantaneous property characterizes the true summits and lowest valleys?">
         <div class="slide-top">
-          <div><div class="meta">Opening Hook // Manim Motion Animation</div><h1>Terrain Exploration: Peaks & Valleys</h1></div>
-          <div class="slide-num">Slide 03 / 22</div>
+          <div><div class="meta">Phase 1 // Visual Motion</div><h1>Terrain Exploration: Peaks & Valleys</h1></div>
+          <div class="slide-num">Slide 03 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene01_HookHill_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/Scene01_HookHill_frame.png">
               <source src="media/videos/clips/Scene01_HookHill.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">PEDAGOGICAL HOOK</h3>
@@ -399,10 +425,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       </div>
 
       <!-- SLIDE 4: Hook Hill Annotation -->
-      <div class="slide" data-title="Terrain Annotation Workspace" data-notes="Take Apple Pencil. Draw tangents at crests and troughs live. Write m = tan(theta) = 0.">
+      <div class="slide" data-title="Terrain Slope Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Tangent Equilibrium & Slope Incline</h1></div>
-          <div class="slide-num">Slide 04 / 22</div>
+          <div class="slide-num">Slide 04 / 23</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -421,20 +447,17 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       </div>
 
       <!-- SLIDE 5: Local vs Absolute Video -->
-      <div class="slide" data-title="Local vs Absolute Extrema" data-notes="Clarify open ball definition: Local requires an open neighborhood. Absolute is domain-wide.">
+      <div class="slide" data-title="Local vs Absolute Extrema">
         <div class="slide-top">
-          <div><div class="meta">Conceptual Foundations // Manim Motion Animation</div><h1>Local Extrema vs. Absolute Boundaries</h1></div>
-          <div class="slide-num">Slide 05 / 22</div>
+          <div><div class="meta">Phase 1 // Topological Foundations</div><h1>Local Extrema vs. Absolute Boundaries</h1></div>
+          <div class="slide-num">Slide 05 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene02_LocalVsAbsolute_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/Scene02_LocalVsAbsolute_frame.png">
               <source src="media/videos/clips/Scene02_LocalVsAbsolute.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">TOPOLOGICAL DISTINCTION</h3>
@@ -452,10 +475,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       </div>
 
       <!-- SLIDE 6: Local vs Absolute Annotation -->
-      <div class="slide" data-title="Neighborhood Test Annotation">
+      <div class="slide" data-title="Neighborhood Test Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>The Neighborhood Test & Boundary Caps</h1></div>
-          <div class="slide-num">Slide 06 / 22</div>
+          <div class="slide-num">Slide 06 / 23</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -473,21 +496,52 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 7: Signature Scene 1 Video -->
-      <div class="slide" data-title="Cubic Trajectory f(x)=x^3-3x">
+      <!-- SLIDE 7: MASTER SEQUENCE (THE FULL CONTINUOUS 3BLUE1BROWN MOVIE) -->
+      <div class="slide" data-title="🌟 MASTER SEQUENCE (Continuous Movie)" data-notes="This is the seamless 24-second master transformation of f(x) = x³ - 3x. It flows uninterrupted across function tracing, dynamic slope telemetry, algebraic factoring morph, drop lines, and concavity verification!">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>The Cubic Function: f(x) = x³ - 3x</h1></div>
-          <div class="slide-num">Slide 07 / 22</div>
+          <div><div class="meta" style="color: var(--amber);">Continuous Mathematical Journey // 3Blue1Brown Style</div><h1>Unified Master Transformation: f(x) = x³ - 3x</h1></div>
+          <div class="slide-num">Slide 07 / 23</div>
+        </div>
+        <div class="slide-body grid-master">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto">
+              <source src="media/videos/clips/SignatureSequenceMaster.mp4" type="video/mp4">
+            </video>
+            <div class="play-pause-indicator">Tap anywhere to Pause / Play</div>
+          </div>
+          <div class="card cyan-border">
+            <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: var(--amber); border-color: var(--amber); margin-bottom: 10px;">🌟 UNIFIED MASTER SEQUENCE</span>
+            <h3 style="color: #fff; font-size: 15px; font-weight: 700; margin-bottom: 8px;">The Complete Kinematic Story</h3>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 12px;">
+              Watch the entire sequence flow seamlessly without interruption:
+            </p>
+            <div style="font-size: 12px; line-height: 1.6; color: var(--text);">
+              <p><strong>1. Kinetic Trajectory:</strong> Curve draws; probe traverses peaks.</p>
+              <p style="margin-top: 4px;"><strong>2. Slope Telemetry:</strong> Tangent freezes horizontal at x = -1 and x = +1.</p>
+              <p style="margin-top: 4px;"><strong>3. Equation Morphing:</strong> 3x² - 3 ➔ 3(x-1)(x+1) ➔ x = ±1.</p>
+              <p style="margin-top: 4px;"><strong>4. Concavity Verification:</strong> f''(-1) = -6 (∩) & f''(1) = +6 (∪).</p>
+            </div>
+            <div style="margin-top: 16px;">
+              <button onclick="replayCurrentVideo()" style="background: var(--amber); color: #000; font-weight: 700; width: 100%; justify-content: center; padding: 8px;">
+                🔁 Replay Master Sequence
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE 8: Signature Scene 1 Video -->
+      <div class="slide" data-title="The Cubic Function Curve">
+        <div class="slide-top">
+          <div><div class="meta">Signature Sequence // Deep Dive</div><h1>The Cubic Function: f(x) = x³ - 3x</h1></div>
+          <div class="slide-num">Slide 08 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene1_TheFunction_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene1_TheFunction_frame.png">
               <source src="media/videos/clips/SignatureScene1_TheFunction.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">MATHEMATICAL MODEL</h3>
@@ -503,21 +557,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 8: Signature Scene 2 Video -->
+      <!-- SLIDE 9: Signature Scene 2 Video -->
       <div class="slide" data-title="Dynamic Tangent Telemetry">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>Dynamic Tangent Line & Slope Telemetry</h1></div>
-          <div class="slide-num">Slide 08 / 22</div>
+          <div><div class="meta">Signature Sequence // Deep Dive</div><h1>Dynamic Tangent Line & Slope Telemetry</h1></div>
+          <div class="slide-num">Slide 09 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene2_TheTangent_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene2_TheTangent_frame.png">
               <source src="media/videos/clips/SignatureScene2_TheTangent.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">DERIVATIVE VELOCITY</h3>
@@ -536,11 +587,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 9: Signature Scene 2 Annotation -->
-      <div class="slide" data-title="Slope Derivation Annotation">
+      <!-- SLIDE 10: Signature Scene 2 Annotation -->
+      <div class="slide" data-title="Power Rule Derivation Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Derivative Derivation & Instantaneous Velocity</h1></div>
-          <div class="slide-num">Slide 09 / 22</div>
+          <div class="slide-num">Slide 10 / 23</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -558,21 +609,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 10: Singularities DNE Video -->
-      <div class="slide" data-title="Singularities DNE">
+      <!-- SLIDE 11: Singularities DNE Video -->
+      <div class="slide" data-title="Singularities (Corners & Cusps)">
         <div class="slide-top">
-          <div><div class="meta">Singularities // Manim Motion Animation</div><h1>When Derivatives Fail: Corners & Cusps</h1></div>
-          <div class="slide-num">Slide 10 / 22</div>
+          <div><div class="meta">Singularities // Critical Points</div><h1>When Derivatives Fail: Corners & Cusps</h1></div>
+          <div class="slide-num">Slide 11 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene03_SingularitiesDNE_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/Scene03_SingularitiesDNE_frame.png">
               <source src="media/videos/clips/Scene03_SingularitiesDNE.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card coral-border">
             <h3 style="color: var(--coral); margin-bottom: 8px;">NON-DIFFERENTIABLE EXTREMA</h3>
@@ -588,11 +636,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 11: Singularities Annotation -->
-      <div class="slide" data-title="Singularity Limits Annotation">
+      <!-- SLIDE 12: Singularities Annotation -->
+      <div class="slide" data-title="Singularity Limits DNE Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Difference Quotient Singularity Proof</h1></div>
-          <div class="slide-num">Slide 11 / 22</div>
+          <div class="slide-num">Slide 12 / 23</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -610,21 +658,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 12: Signature Scene 7 Video Counterexample -->
-      <div class="slide" data-title="Counterexample g(x)=x^3">
+      <!-- SLIDE 13: Signature Scene 7 Video Counterexample -->
+      <div class="slide" data-title="Critical Trap g(x)=x³ Terrace">
         <div class="slide-top">
-          <div><div class="meta">Counterexample // Manim Motion Animation</div><h1>The Critical Trap: g(x) = x³ Inflection Terrace</h1></div>
-          <div class="slide-num">Slide 12 / 22</div>
+          <div><div class="meta">Counterexample // The Critical Trap</div><h1>The Critical Trap: g(x) = x³ Inflection Terrace</h1></div>
+          <div class="slide-num">Slide 13 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene7_Counterexample_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene7_Counterexample_frame.png">
               <source src="media/videos/clips/SignatureScene7_Counterexample.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">THE CRITICAL POINT TRAP</h3>
@@ -641,11 +686,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 13: Counterexample Annotation -->
-      <div class="slide" data-title="Logic of Fermat Theorem">
+      <!-- SLIDE 14: Counterexample Annotation -->
+      <div class="slide" data-title="Necessary vs Sufficient Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Logical Implication: Necessary vs. Sufficient</h1></div>
-          <div class="slide-num">Slide 13 / 22</div>
+          <div class="slide-num">Slide 14 / 23</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -663,21 +708,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 14: Signature Scene 3 Video Morphing -->
-      <div class="slide" data-title="Equation Morphing">
+      <!-- SLIDE 15: Signature Scene 3 Video Morphing -->
+      <div class="slide" data-title="Equation Factoring Morph">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim TransformMatchingTex Morphing</div><h1>Algebraic Morphing: Factoring the Derivative</h1></div>
-          <div class="slide-num">Slide 14 / 22</div>
+          <div><div class="meta">Signature Sequence // TransformMatchingTex</div><h1>Algebraic Morphing: Factoring the Derivative</h1></div>
+          <div class="slide-num">Slide 15 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene3_EquationMorph_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene3_EquationMorph_frame.png">
               <source src="media/videos/clips/SignatureScene3_EquationMorph.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: var(--amber); border-color: var(--amber);">🎬 3Blue1Brown Equation Morphing</span>
-              <button onclick="replayVideo(this)" style="background: var(--amber); color: #000; font-weight: 700;">🔁 Replay Morphing</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">CONTINUOUS MORPH</h3>
@@ -698,21 +740,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 15: Signature Scene 4 Video Sign Chart -->
+      <!-- SLIDE 16: Signature Scene 4 Video Sign Chart -->
       <div class="slide" data-title="First Derivative Test Sign Chart">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>First Derivative Test: Dynamic Sign Chart</h1></div>
-          <div class="slide-num">Slide 15 / 22</div>
+          <div><div class="meta">First Derivative Test // Interval Signs</div><h1>First Derivative Test: Dynamic Sign Chart</h1></div>
+          <div class="slide-num">Slide 16 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene4_DerivativeTest_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene4_DerivativeTest_frame.png">
               <source src="media/videos/clips/SignatureScene4_DerivativeTest.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">INTERVAL DYNAMICS</h3>
@@ -730,11 +769,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 16: Signature Scene 4 Annotation -->
-      <div class="slide" data-title="Sign Chart Construction">
+      <!-- SLIDE 17: Signature Scene 4 Annotation -->
+      <div class="slide" data-title="Sign Chart Table Workspace">
         <div class="slide-top">
           <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Constructing the Derivative Sign Table</h1></div>
-          <div class="slide-num">Slide 16 / 22</div>
+          <div class="slide-num">Slide 17 / 23</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
@@ -753,21 +792,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 17: Signature Scene 5 Video Extrema Reveal -->
+      <!-- SLIDE 18: Signature Scene 5 Video Extrema Reveal -->
       <div class="slide" data-title="Extrema Coordinates Reveal">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>Exact Extrema Coordinates: (-1, 2) & (1, -2)</h1></div>
-          <div class="slide-num">Slide 17 / 22</div>
+          <div><div class="meta">Extrema Coordinates // Function Evaluation</div><h1>Exact Extrema Coordinates: (-1, 2) & (1, -2)</h1></div>
+          <div class="slide-num">Slide 18 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene5_ExtremaReveal_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene5_ExtremaReveal_frame.png">
               <source src="media/videos/clips/SignatureScene5_ExtremaReveal.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">COORDINATE VERIFICATION</h3>
@@ -786,21 +822,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 18: Signature Scene 6 Video Second Derivative -->
+      <!-- SLIDE 19: Signature Scene 6 Video Second Derivative -->
       <div class="slide" data-title="Second Derivative & Concavity">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>Second Derivative Test & Concavity Bending</h1></div>
-          <div class="slide-num">Slide 18 / 22</div>
+          <div><div class="meta">Second Derivative // Curvature Bending</div><h1>Second Derivative Test & Concavity Bending</h1></div>
+          <div class="slide-num">Slide 19 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene6_SecondDerivative_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene6_SecondDerivative_frame.png">
               <source src="media/videos/clips/SignatureScene6_SecondDerivative.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">CURVATURE RATE</h3>
@@ -819,11 +852,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 19: Test Comparison Matrix -->
+      <!-- SLIDE 20: Test Comparison Matrix -->
       <div class="slide" data-title="1st vs 2nd Test Comparison">
         <div class="slide-top">
           <div><div class="meta">Comparative Analysis // Decision Logic</div><h1>Extrema Decision Matrix: 1st vs. 2nd Test</h1></div>
-          <div class="slide-num">Slide 19 / 22</div>
+          <div class="slide-num">Slide 20 / 23</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card cyan-border">
@@ -857,21 +890,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 20: Scene 04 Video Closed Interval -->
-      <div class="slide" data-title="Closed Interval Method">
+      <!-- SLIDE 21: Scene 04 Video Closed Interval -->
+      <div class="slide" data-title="Closed Interval EVT">
         <div class="slide-top">
-          <div><div class="meta">Optimization Theory // Manim Motion Animation</div><h1>Closed Interval Method & Candidate Matrix</h1></div>
-          <div class="slide-num">Slide 20 / 22</div>
+          <div><div class="meta">Optimization Theory // Closed Domain</div><h1>Closed Interval Method & Candidate Matrix</h1></div>
+          <div class="slide-num">Slide 21 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene04_ClosedIntervalMethod_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/Scene04_ClosedIntervalMethod_frame.png">
               <source src="media/videos/clips/Scene04_ClosedIntervalMethod.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card green-border">
             <h3 style="color: var(--green); margin-bottom: 8px;">CANDIDATE EVALUATION</h3>
@@ -889,21 +919,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 21: Scene 05 Video Engineering App -->
+      <!-- SLIDE 22: Scene 05 Video Engineering App -->
       <div class="slide" data-title="Engineering: Maximum Power Transfer">
         <div class="slide-top">
-          <div><div class="meta">Engineering Application // Manim Motion Animation</div><h1>Maximum Power Transfer Theorem</h1></div>
-          <div class="slide-num">Slide 21 / 22</div>
+          <div><div class="meta">Engineering Application // Circuits</div><h1>Maximum Power Transfer Theorem</h1></div>
+          <div class="slide-num">Slide 22 / 23</div>
         </div>
         <div class="slide-body grid-video">
-          <div class="video-wrapper">
-            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene05_MaxPowerTransfer_frame.png">
+          <div class="seamless-video-canvas" onclick="toggleVideoPlayback(this)">
+            <video autoplay muted playsinline preload="auto" poster="media/frames/Scene05_MaxPowerTransfer_frame.png">
               <source src="media/videos/clips/Scene05_MaxPowerTransfer.mp4" type="video/mp4">
             </video>
-            <div class="video-toolbar">
-              <span class="badge">🎬 Manim 1080p Video</span>
-              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
-            </div>
+            <div class="play-pause-indicator">Tap to Pause / Play</div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">CIRCUIT OPTIMIZATION</h3>
@@ -921,11 +948,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         </div>
       </div>
 
-      <!-- SLIDE 22: Practice Challenge & Exit Ticket -->
+      <!-- SLIDE 23: Practice Challenge & Exit Ticket -->
       <div class="slide" data-title="Practice Problem & Exit Ticket">
         <div class="slide-top">
           <div><div class="meta">Active Learning // Exit Challenge</div><h1>Practice Challenge & Verification Key</h1></div>
-          <div class="slide-num">Slide 22 / 22</div>
+          <div class="slide-num">Slide 23 / 23</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card amber-border">
@@ -975,7 +1002,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <footer>
     <button id="prevBtn">◀ Previous</button>
     <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
-    <span id="slideIndicator" style="font-weight: 600; color: var(--muted); min-width: 90px; text-align: center;">01 / 22</span>
+    <span id="slideIndicator" style="font-weight: 600; color: var(--muted); min-width: 90px; text-align: center;">01 / 23</span>
     <button id="nextBtn">Next ▶</button>
   </footer>
 
@@ -992,7 +1019,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       const vid = slideEl.querySelector('video');
       if (vid) {
         vid.currentTime = 0;
-        vid.muted = true; // Ensures seamless autoplay across iPad Safari & desktop
+        vid.muted = true; // Essential for seamless mobile Safari / Chrome autoplay
         const p = vid.play();
         if (p !== undefined) {
           p.catch(e => console.log('Autoplay hint:', e));
@@ -1000,14 +1027,23 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       }
     }
 
-    function replayVideo(btn) {
-      const wrapper = btn.closest('.video-wrapper');
-      if (wrapper) {
-        const vid = wrapper.querySelector('video');
-        if (vid) {
-          vid.currentTime = 0;
+    function toggleVideoPlayback(container) {
+      const vid = container.querySelector('video');
+      if (vid) {
+        if (vid.paused) {
           vid.play();
+        } else {
+          vid.pause();
         }
+      }
+    }
+
+    function replayCurrentVideo() {
+      const activeSlide = slides[currentSlide];
+      const vid = activeSlide.querySelector('video');
+      if (vid) {
+        vid.currentTime = 0;
+        vid.play();
       }
     }
 
@@ -1030,7 +1066,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       const notes = slides[currentSlide].getAttribute('data-notes') || 'No specific notes for this slide.';
       notesContent.textContent = notes;
 
-      // Autoplay current slide's Manim video automatically
+      // Seamlessly trigger video playback on slide arrival
       playSlideVideo(slides[currentSlide]);
     }
 
@@ -1043,9 +1079,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       });
     }
 
+    // Keyboard Navigation (Space / Right Arrow = Next, Left Arrow = Previous)
     window.addEventListener('keydown', (e) => {
-      if (e.key === 'ArrowRight' || e.key === ' ') showSlide(currentSlide + 1);
-      else if (e.key === 'ArrowLeft') showSlide(currentSlide - 1);
+      if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+        showSlide(currentSlide + 1);
+      } else if (e.key === 'ArrowLeft') {
+        showSlide(currentSlide - 1);
+      }
     });
 
     // Teleprompter toggle
@@ -1149,6 +1189,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     canvas.addEventListener('touchmove', draw, { passive: false });
     canvas.addEventListener('touchend', stopDraw);
 
+    // Initial load
     showSlide(0);
   </script>
 </body>
@@ -1156,21 +1197,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 """
 
 def main():
-    root_file = "index.html"
-    public_file = "public/index.html"
-    presentation_file = "presentation/player.html"
-    
-    with open(root_file, "w", encoding="utf-8") as f:
-        f.write(HTML_TEMPLATE)
-    print(f"Updated {root_file}")
-    
-    with open(public_file, "w", encoding="utf-8") as f:
-        f.write(HTML_TEMPLATE)
-    print(f"Updated {public_file}")
-
-    with open(presentation_file, "w", encoding="utf-8") as f:
-        f.write(HTML_TEMPLATE)
-    print(f"Updated {presentation_file}")
+    for filepath in ["index.html", "public/index.html", "presentation/player.html"]:
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(HTML_TEMPLATE)
+        print(f"Updated {filepath}")
 
 if __name__ == "__main__":
     main()
