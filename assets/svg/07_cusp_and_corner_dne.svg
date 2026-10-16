@@ -1,0 +1,72 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <rect width="960" height="540" fill="#0B0F19" rx="12"/>
+  
+  <defs>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#F43F5E" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#F43F5E"/>
+    </marker>
+    <marker id="arrowSlate" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#64748B"/>
+    </marker>
+  </defs>
+
+
+  <!-- Divider line -->
+  <line x1="480" y1="40" x2="480" y2="500" stroke="#334155" stroke-width="2" stroke-dasharray="6,6"/>
+
+  <!-- Left Side: Corner |x| -->
+  <g transform="translate(40, 0)">
+    <text x="200" y="70" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="20" font-weight="700" text-anchor="middle">Case A: The Corner (f(x) = |x|)</text>
+    <line x1="40" y1="360" x2="380" y2="360" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+    <line x1="210" y1="420" x2="210" y2="120" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+
+    <!-- Sharp V curve -->
+    <path d="M 70 220 L 210 360 L 350 220" fill="none" stroke="#38BDF8" stroke-width="4"/>
+    <circle cx="210" cy="360" r="7" fill="#F43F5E" stroke="#F8FAFC" stroke-width="2"/>
+
+    <!-- Slopes -->
+    <text x="110" y="270" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Left slope = -1</text>
+    <text x="270" y="270" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Right slope = +1</text>
+
+    <rect x="80" y="400" width="260" height="60" rx="8" fill="#1E293B" stroke="#F43F5E" stroke-width="1.5"/>
+    <text x="210" y="425" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">f'(0) DOES NOT EXIST (DNE)</text>
+    <text x="210" y="445" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Yet x=0 is a true Local Minimum!</text>
+  </g>
+
+  <!-- Right Side: Cusp x^(2/3) -->
+  <g transform="translate(520, 0)">
+    <text x="200" y="70" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="20" font-weight="700" text-anchor="middle">Case B: The Cusp (f(x) = x^(2/3))</text>
+    <line x1="40" y1="360" x2="380" y2="360" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+    <line x1="210" y1="420" x2="210" y2="120" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+
+    <!-- Cusp shape -->
+    <path d="M 70 180 C 140 300, 190 350, 210 360 C 230 350, 280 300, 350 180" fill="none" stroke="#38BDF8" stroke-width="4"/>
+    <circle cx="210" cy="360" r="7" fill="#F43F5E" stroke="#F8FAFC" stroke-width="2"/>
+
+    <!-- Slopes tending to vertical -->
+    <text x="80" y="270" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Slope → -∞</text>
+    <text x="290" y="270" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="600">Slope → +∞</text>
+
+    <rect x="80" y="400" width="260" height="60" rx="8" fill="#1E293B" stroke="#F43F5E" stroke-width="1.5"/>
+    <text x="210" y="425" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" text-anchor="middle">VERTICAL TANGENT (DNE)</text>
+    <text x="210" y="445" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Sharp Local Minimum at x=0!</text>
+  </g>
+</svg>

@@ -1,0 +1,1657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Maxima & Minima: Differential Calculus for Engineering</title>
+  <style>
+    :root {
+      --bg-dark: #0B0F19;
+      --bg-card: #111827;
+      --bg-card-subtle: #1E293B;
+      --cyan: #38BDF8;
+      --cyan-glow: #06B6D4;
+      --amber: #F59E0B;
+      --coral: #F43F5E;
+      --text-main: #F8FAFC;
+      --text-muted: #94A3B8;
+      --text-dim: #64748B;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(56, 189, 248, 0.3);
+      --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: "SF Mono", "Fira Code", Menlo, Monaco, Consolas, monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    body {
+      background-color: #030712;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+      overflow: hidden;
+      touch-action: none;
+    }
+
+    /* 16:9 Presentation Stage */
+    #stage-container {
+      position: relative;
+      width: 100vw;
+      height: 56.25vw; /* 16:9 ratio */
+      max-height: 100vh;
+      max-width: 177.78vh; /* 16:9 ratio */
+      background-color: var(--bg-dark);
+      overflow: hidden;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Presentation Header Bar */
+    .slide-header {
+      height: 56px;
+      padding: 0 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border);
+      background: rgba(11, 15, 25, 0.7);
+      backdrop-filter: blur(8px);
+      z-index: 10;
+    }
+
+    .slide-badge {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 13px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--cyan);
+    }
+
+    .slide-badge::before {
+      content: "";
+      width: 8px;
+      height: 8px;
+      background: var(--cyan);
+      border-radius: 50%;
+      box-shadow: 0 0 10px var(--cyan);
+    }
+
+    .slide-title-header {
+      font-size: 15px;
+      font-weight: 600;
+      color: var(--text-muted);
+    }
+
+    .slide-counter {
+      font-family: var(--font-mono);
+      font-size: 13px;
+      color: var(--text-dim);
+      font-weight: 600;
+    }
+
+    /* Slide Main Canvas Area */
+    .slide-viewport {
+      flex: 1;
+      position: relative;
+      width: 100%;
+      height: calc(100% - 56px);
+      overflow: hidden;
+    }
+
+    .slide {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      padding: 40px 60px 50px 60px;
+      display: none;
+      flex-direction: column;
+      opacity: 0;
+      transform: scale(0.98);
+      transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .slide.active {
+      display: flex;
+      opacity: 1;
+      transform: scale(1);
+      z-index: 2;
+    }
+
+    /* Slide Typography */
+    .slide-heading {
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #FFFFFF;
+      margin-bottom: 8px;
+      line-height: 1.15;
+    }
+
+    .slide-subtitle {
+      font-size: 18px;
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      font-weight: 400;
+      line-height: 1.4;
+    }
+
+    .accent-cyan { color: var(--cyan); }
+    .accent-amber { color: var(--amber); }
+    .accent-coral { color: var(--coral); }
+
+    /* Layout Grids */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 36px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-2col-equal {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 32px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    .grid-3col {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 24px;
+      flex: 1;
+      min-height: 0;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .card.highlight-cyan {
+      border-color: rgba(56, 189, 248, 0.4);
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.1);
+    }
+
+    .card.highlight-amber {
+      border-color: rgba(245, 158, 11, 0.4);
+      box-shadow: 0 0 20px rgba(245, 158, 11, 0.1);
+    }
+
+    .card.highlight-coral {
+      border-color: rgba(244, 63, 94, 0.4);
+      box-shadow: 0 0 20px rgba(244, 63, 94, 0.1);
+    }
+
+    /* Annotation Scratchpad Zone for iPad Apple Pencil */
+    .scratchpad-zone {
+      background: rgba(15, 23, 42, 0.6);
+      border: 2px dashed rgba(56, 189, 248, 0.25);
+      border-radius: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      padding: 16px;
+      background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
+
+    .scratchpad-label {
+      position: absolute;
+      top: -12px;
+      right: 20px;
+      background: var(--bg-card-subtle);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--cyan);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 10px;
+      border-radius: 10px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+
+    /* Math Formula Boxes */
+    .math-block {
+      background: var(--bg-card-subtle);
+      border-left: 4px solid var(--cyan);
+      border-radius: 0 10px 10px 0;
+      padding: 14px 20px;
+      font-family: var(--font-mono);
+      font-size: 17px;
+      color: var(--text-main);
+      margin-bottom: 14px;
+      display: flex;
+      align-items: center;
+      line-height: 1.5;
+    }
+
+    .math-block.amber {
+      border-left-color: var(--amber);
+    }
+
+    .math-block.coral {
+      border-left-color: var(--coral);
+    }
+
+    /* Progressive Reveals (Build Steps) */
+    .build-item {
+      opacity: 0;
+      transform: translateY(14px);
+      transition: opacity 0.35s ease, transform 0.35s ease;
+      pointer-events: none;
+    }
+
+    .build-item.revealed {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    /* UI Controls Bar */
+    #toolbar {
+      position: absolute;
+      bottom: 18px;
+      right: 24px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(17, 24, 39, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      padding: 6px 14px;
+      border-radius: 30px;
+      z-index: 100;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    .btn-tool {
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 15px;
+      transition: all 0.2s;
+    }
+
+    .btn-tool:hover, .btn-tool.active {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.1);
+    }
+
+    .btn-tool.active-pen {
+      background: var(--cyan);
+      color: #0B0F19;
+    }
+
+    /* Annotation Canvas Layer */
+    #annotation-layer {
+      position: absolute;
+      top: 56px;
+      left: 0;
+      width: 100%;
+      height: calc(100% - 56px);
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    #annotation-layer.drawing-active {
+      pointer-events: auto;
+      cursor: crosshair;
+    }
+
+    /* Speaker Notes Drawer */
+    #speaker-notes-panel {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 240px;
+      background: rgba(15, 23, 42, 0.95);
+      backdrop-filter: blur(16px);
+      border-top: 2px solid var(--cyan);
+      padding: 24px 40px;
+      z-index: 120;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      overflow-y: auto;
+    }
+
+    #speaker-notes-panel.open {
+      transform: translateY(0);
+    }
+
+    .notes-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--cyan);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 8px;
+    }
+
+    .notes-content {
+      font-size: 15px;
+      line-height: 1.6;
+      color: #E2E8F0;
+    }
+
+    /* Grid Overview Modal */
+    #grid-modal {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(11, 15, 25, 0.96);
+      backdrop-filter: blur(20px);
+      z-index: 200;
+      padding: 40px;
+      display: none;
+      flex-direction: column;
+      overflow-y: auto;
+    }
+
+    #grid-modal.open {
+      display: flex;
+    }
+
+    .grid-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .grid-thumbnails {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .grid-thumb {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .grid-thumb:hover {
+      border-color: var(--cyan);
+      transform: translateY(-2px);
+    }
+
+    .grid-thumb-num {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--cyan);
+      margin-bottom: 4px;
+    }
+
+    .grid-thumb-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-main);
+    }
+
+    /* Image / Vector Container */
+    .vector-frame {
+      width: 100%;
+      height: 100%;
+      min-height: 280px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .vector-frame img, .vector-frame svg {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    /* Keynote Helper Badge */
+    .keynote-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(245, 158, 11, 0.15);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+      color: var(--amber);
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      margin-bottom: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="stage-container">
+  <!-- Slide Header -->
+  <div class="slide-header">
+    <div class="slide-badge" id="header-unit">Differential Calculus // Engineering Optimization</div>
+    <div class="slide-title-header" id="header-title">01. Turning Points &amp; Landscape</div>
+    <div class="slide-counter" id="slide-num">01 / 22</div>
+  </div>
+
+  <!-- Slide Canvas Viewport -->
+  <div class="slide-viewport">
+
+    <!-- SLIDE 1: Hook & Title -->
+    <div class="slide active" data-slide="1" data-title="The Landscape of Optimization">
+      <div style="flex: 1; display: flex; flex-direction: column;">
+        <div class="keynote-badge">⚡ KEYNOTE BUILD: MAGIC MOVE SEED // 16:9 NATIVE</div>
+        <h1 class="slide-heading">The Geometry of <span class="accent-cyan">Turning Points</span></h1>
+        <p class="slide-subtitle">Where does nature pause? Where does an engineering system attain peak performance, resonance, or catastrophic failure?</p>
+
+        <div class="grid-2col" style="flex: 1;">
+          <div class="card" style="padding: 10px; overflow: hidden;">
+            <div class="vector-frame">
+              <img src="assets/svg/01_hook_curve.svg" alt="Terrain curve with local peaks and valleys">
+            </div>
+          </div>
+          <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+            <div>
+              <div class="math-block">
+                <span>Problem Statement: y = f(x) ∈ C¹[a, b]</span>
+              </div>
+              <p style="font-size: 15px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+                As an autonomous vehicle traverses terrain or an amplifier processes a signal, state variables continuously evolve. At the summits and basins, something remarkable occurs:
+              </p>
+              <div class="build-item" data-build="1">
+                <div class="math-block amber">
+                  <span>The instantaneous rate of change vanishes: f'(x) = 0</span>
+                </div>
+              </div>
+              <div class="build-item" data-build="2">
+                <div class="math-block coral">
+                  <span>OR the rate of change is undefined: f'(x) does not exist!</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Apple Pencil Scratchpad -->
+            <div class="scratchpad-zone" style="height: 130px;">
+              <span class="scratchpad-label">Apple Pencil Annotation Zone</span>
+              <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Sketch tangent line slope vector at x₀]</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 2: Roadmap & Central Question -->
+    <div class="slide" data-slide="2" data-title="Lecture Architecture & Central Question">
+      <h1 class="slide-heading">The Central Engineering Question</h1>
+      <p class="slide-subtitle">Given a mathematical model of an engineering system, how do we systematically identify, rigorously classify, and safely verify its extreme operating states?</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-cyan">
+          <h3 style="font-size: 20px; color: var(--cyan); margin-bottom: 14px;">The 4 Core Pillars of this Lecture</h3>
+          <div style="display: flex; flex-direction: column; gap: 14px;">
+            <div class="build-item" data-build="1">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <span style="background: var(--bg-card-subtle); color: var(--cyan); font-weight: 800; font-size: 13px; padding: 4px 8px; border-radius: 6px;">01</span>
+                <div>
+                  <strong style="font-size: 15px; color: #FFF;">The Geometry of Turning</strong>
+                  <p style="font-size: 13px; color: var(--text-muted);">Fermat's Theorem, horizontal tangents, and critical numbers.</p>
+                </div>
+              </div>
+            </div>
+            <div class="build-item" data-build="2">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <span style="background: var(--bg-card-subtle); color: var(--cyan); font-weight: 800; font-size: 13px; padding: 4px 8px; border-radius: 6px;">02</span>
+                <div>
+                  <strong style="font-size: 15px; color: #FFF;">The Classification Engines</strong>
+                  <p style="font-size: 13px; color: var(--text-muted);">First Derivative Test (Sign Chart) vs Second Derivative Test (Curvature).</p>
+                </div>
+              </div>
+            </div>
+            <div class="build-item" data-build="3">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <span style="background: var(--bg-card-subtle); color: var(--amber); font-weight: 800; font-size: 13px; padding: 4px 8px; border-radius: 6px;">03</span>
+                <div>
+                  <strong style="font-size: 15px; color: #FFF;">Boundary Constraints</strong>
+                  <p style="font-size: 13px; color: var(--text-muted);">Extreme Value Theorem on [a, b]: Why endpoints hold catastrophic surprises.</p>
+                </div>
+              </div>
+            </div>
+            <div class="build-item" data-build="4">
+              <div style="display: flex; gap: 12px; align-items: flex-start;">
+                <span style="background: var(--bg-card-subtle); color: var(--coral); font-weight: 800; font-size: 13px; padding: 4px 8px; border-radius: 6px;">04</span>
+                <div>
+                  <strong style="font-size: 15px; color: #FFF;">Physical Optimization Modeling</strong>
+                  <p style="font-size: 13px; color: var(--text-muted);">Maximum Power Transfer Theorem and structural design applications.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; color: var(--text-main); margin-bottom: 12px;">Socratic Teaching Pause</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            "If a derivative is zero at a point, does the system definitely have a peak or valley? Why or why not?"
+          </p>
+          <div class="scratchpad-zone" style="flex: 1;">
+            <span class="scratchpad-label">Interactive Notes Space</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Elicit student guesses; note the distinction between necessary and sufficient conditions]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 3: Intuitive Meaning of Extrema -->
+    <div class="slide" data-slide="3" data-title="Intuitive Meaning of Extrema">
+      <h1 class="slide-heading">Intuitive Meaning: <span class="accent-cyan">Peaks, Valleys &amp; Equilibrium</span></h1>
+      <p class="slide-subtitle">In physical systems, extrema correspond to equilibrium states, limits of stability, and optimum operating points.</p>
+
+      <div class="grid-3col">
+        <div class="card highlight-cyan">
+          <div style="font-size: 13px; font-weight: 700; color: var(--cyan); text-transform: uppercase; margin-bottom: 8px;">Mechanical / Civil</div>
+          <h3 style="font-size: 18px; color: #FFF; margin-bottom: 12px;">Potential Energy Wells</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+            Force F = -dU/dx. At potential energy extrema (dU/dx = 0), net force vanishes:
+          </p>
+          <div class="math-block">
+            <span>U_min ⇒ Stable Eq.</span>
+          </div>
+          <div class="math-block coral">
+            <span>U_max ⇒ Unstable Eq.</span>
+          </div>
+        </div>
+
+        <div class="card highlight-amber">
+          <div style="font-size: 13px; font-weight: 700; color: var(--amber); text-transform: uppercase; margin-bottom: 8px;">Electrical / Electronics</div>
+          <h3 style="font-size: 18px; color: #FFF; margin-bottom: 12px;">Impedance Matching</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+            Transmitting power from a source to a load resistor without reflection or thermal burn-out requires operating at the absolute peak of the power curve:
+          </p>
+          <div class="math-block amber">
+            <span>dP/dR_L = 0 ⇒ R_L = R_s</span>
+          </div>
+        </div>
+
+        <div class="card highlight-coral">
+          <div style="font-size: 13px; font-weight: 700; color: var(--coral); text-transform: uppercase; margin-bottom: 8px;">Aerospace / Chemical</div>
+          <h3 style="font-size: 18px; color: #FFF; margin-bottom: 12px;">Optimal Reaction Temp</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 16px;">
+            Balancing reaction kinetics against catalyst degradation curves. The global peak defines the optimal operating envelope:
+          </p>
+          <div class="math-block coral">
+            <span>d(Yield)/dT = 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 4: Local vs Absolute Extrema -->
+    <div class="slide" data-slide="4" data-title="Local vs Absolute (Global) Extrema">
+      <h1 class="slide-heading">Local vs. <span class="accent-coral">Absolute (Global)</span> Extrema</h1>
+      <p class="slide-subtitle">Local extrema govern immediate neighborhoods; Absolute extrema govern the entire allowable physical domain.</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 10px;">
+          <div class="vector-frame">
+            <img src="assets/svg/04_local_vs_global.svg" alt="Local vs Global extrema diagram">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 18px; color: var(--cyan); margin-bottom: 10px;">Mathematical Rigor</h3>
+            <div class="math-block">
+              <span>Local Max at c: ∃ δ > 0 s.t. f(c) ≥ f(x) ∀ x ∈ (c-δ, c+δ)</span>
+            </div>
+            <div class="build-item" data-build="1">
+              <div class="math-block coral">
+                <span>Absolute Max on D: f(c) ≥ f(x) ∀ x ∈ D</span>
+              </div>
+            </div>
+            <div class="build-item" data-build="2">
+              <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-top: 10px;">
+                <strong style="color: var(--amber);">Notice on the graph:</strong> An interior turning point can be a local maximum while being completely surpassed by a boundary endpoint!
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 130px;">
+            <span class="scratchpad-label">Apple Pencil Annotation</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Draw delta-neighborhood (c-δ, c+δ) around local peak]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 5: Increasing and Decreasing Functions -->
+    <div class="slide" data-slide="5" data-title="Increasing and Decreasing Functions">
+      <h1 class="slide-heading">The Sign of the Derivative: <span class="accent-cyan">Rise</span> &amp; <span class="accent-coral">Fall</span></h1>
+      <p class="slide-subtitle">The tangent slope directs the function's physical trajectory through the Mean Value Theorem.</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 10px;">
+          <div class="vector-frame">
+            <img src="assets/svg/05_slopes_and_intervals.svg" alt="Increasing vs decreasing curve with tangents">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="math-block">
+              <span>f'(x) > 0 on (a, b) ⇒ f is Strictly INCREASING ↗</span>
+            </div>
+            <div class="build-item" data-build="1">
+              <div class="math-block coral">
+                <span>f'(x) < 0 on (b, c) ⇒ f is Strictly DECREASING ↘</span>
+              </div>
+            </div>
+            <div class="build-item" data-build="2">
+              <div class="math-block amber">
+                <span>At the peak: The transition requires f'(x) = 0</span>
+              </div>
+              <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5;">
+                By the Intermediate Value Property of derivatives (Darboux's Theorem), if a smooth derivative switches from positive to negative, it <em>must</em> pass through zero.
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 120px;">
+            <span class="scratchpad-label">Apple Pencil Scratchpad</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Write MVT proof sketch: (f(x2)-f(x1))/(x2-x1) = f'(c) > 0]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 6: Slope and Turning Points -->
+    <div class="slide" data-slide="6" data-title="Horizontal Tangents & Fermat's Theorem">
+      <h1 class="slide-heading">Fermat's Theorem: <span class="accent-amber">Horizontal Tangents</span></h1>
+      <p class="slide-subtitle">At any smooth interior turning point, the tangent line must become perfectly horizontal.</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 10px;">
+          <div class="vector-frame">
+            <img src="assets/svg/06_tangent_to_stationary.svg" alt="Tangent lines rotating into horizontal">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="math-block amber">
+              <span>Fermat's Theorem (1636):</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 12px;">
+              If $f$ has a local extremum at an interior point $c$ of its domain, and if $f'(c)$ exists, then:
+            </p>
+            <div class="math-block" style="font-size: 20px; font-weight: 700; text-align: center;">
+              <span>f'(c) = 0</span>
+            </div>
+            <div class="build-item" data-build="1">
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-top: 10px;">
+                <strong>Geometric Intuition:</strong> From the left, slopes $\ge 0$. From the right, slopes $\le 0$. Since $f'(c)$ exists, both one-sided limits must agree. The only real number $\ge 0$ and $\le 0$ is <strong>zero</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 120px;">
+            <span class="scratchpad-label">Apple Pencil Proof Sketch</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Write limit of difference quotients from left and right]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 7: Critical Numbers Definition -->
+    <div class="slide" data-slide="7" data-title="Critical Numbers: The Complete Definition">
+      <h1 class="slide-heading">Critical Numbers: <span class="accent-cyan">The Complete Definition</span></h1>
+      <p class="slide-subtitle">A critical number is a candidate location where an extremum might reside.</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-cyan">
+          <h3 style="font-size: 20px; color: var(--cyan); margin-bottom: 14px;">Rigorous Definition</h3>
+          <p style="font-size: 15px; color: var(--text-main); line-height: 1.6; margin-bottom: 14px;">
+            Let $f$ be defined on an open interval containing $c$. The number $c$ is a <strong>critical number</strong> if:
+          </p>
+          <div class="math-block">
+            <span>Condition 1: f'(c) = 0  (Stationary Point)</span>
+          </div>
+          <div class="build-item" data-build="1">
+            <div class="math-block coral">
+              <span>Condition 2: f'(c) DOES NOT EXIST  (Singular Point)</span>
+            </div>
+          </div>
+          <div class="build-item" data-build="2">
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-top: 10px;">
+              ⚠️ <strong>Critical Precondition:</strong> $c$ MUST be in the domain of $f$! A vertical asymptote (e.g. $x=0$ for $1/x$) is <em>not</em> a critical number because $f(0)$ is undefined.
+            </p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; color: var(--amber); margin-bottom: 12px;">Engineering Implications</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.6; margin-bottom: 16px;">
+            In mechanical stress analysis or digital signal filtering, points where derivatives fail (sharp edges, impact shocks, digital thresholds) frequently represent the <em>maximum stress</em> or <em>peak energy dissipation</em>.
+          </p>
+          <div class="scratchpad-zone" style="flex: 1;">
+            <span class="scratchpad-label">Apple Pencil Work Area</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Emphasize: Extrema can hide where f'(c) fails!]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 8: When Derivative Does Not Exist -->
+    <div class="slide" data-slide="8" data-title="When Derivative Fails to Exist (DNE)">
+      <h1 class="slide-heading">The Singular Points: <span class="accent-coral">Corners &amp; Cusps</span></h1>
+      <p class="slide-subtitle">Never restrict your search to f'(x) = 0. Real systems contain singularities!</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 10px;">
+          <div class="vector-frame">
+            <img src="assets/svg/07_cusp_and_corner_dne.svg" alt="Corners and Cusps where derivative fails">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="math-block">
+              <span>Case A: f(x) = |x| at x = 0</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+              lim_{h→0⁻} (f(h)-0)/h = -1, while lim_{h→0⁺} (f(h)-0)/h = +1. Derivative DNE, but x = 0 is an absolute minimum!
+            </p>
+            <div class="build-item" data-build="1">
+              <div class="math-block coral">
+                <span>Case B: f(x) = x^(2/3) at x = 0</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                f'(x) = 2 / (3 x^(1/3)). As x → 0, f'(x) → ±∞ (vertical tangent). Yet x = 0 is a sharp minimum!
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 120px;">
+            <span class="scratchpad-label">Apple Pencil Scratchpad</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Write domain verification: 0 is in domain of x^(2/3) since 0^(2/3)=0]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 9: Why f'(x)=0 does NOT imply max or min -->
+    <div class="slide" data-slide="9" data-title="The Stationary Inflection Trap">
+      <h1 class="slide-heading">The Misconception Trap: <span class="accent-coral">f(x) = x³</span></h1>
+      <p class="slide-subtitle">f'(c) = 0 is a NECESSARY condition for smooth extrema, but NOT a SUFFICIENT condition!</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 10px;">
+          <div class="vector-frame">
+            <img src="assets/svg/08_stationary_inflection_cubic.svg" alt="Stationary inflection point for y = x^3">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="math-block coral">
+              <span>Counterexample: f(x) = x³ at x = 0</span>
+            </div>
+            <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 12px;">
+              1. Compute derivative: <strong>f'(x) = 3x²</strong><br>
+              2. Evaluate at origin: <strong>f'(0) = 0</strong> (Horizontal Tangent!)<br>
+              3. Check neighborhood:
+            </p>
+            <div class="build-item" data-build="1">
+              <div class="math-block">
+                <span>x &lt; 0 ⇒ f'(x) = 3(-0.5)² = +0.75 &gt; 0  (RISING ↗)</span>
+              </div>
+            </div>
+            <div class="build-item" data-build="2">
+              <div class="math-block">
+                <span>x &gt; 0 ⇒ f'(x) = 3(+0.5)² = +0.75 &gt; 0  (RISING ↗)</span>
+              </div>
+            </div>
+            <div class="build-item" data-build="3">
+              <p style="font-size: 14px; color: var(--amber); font-weight: 600; line-height: 1.5;">
+                The slope paused, but NEVER turned around. This is a <em>stationary inflection point</em> (terrace point).
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 100px;">
+            <span class="scratchpad-label">Key Takeaway</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Circle origin; write: "Critical Point = Candidate, not Verdict!"]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 10: First Derivative Test (FDT) & Sign Chart -->
+    <div class="slide" data-slide="10" data-title="The First Derivative Test (FDT)">
+      <h1 class="slide-heading">The First Derivative Test: <span class="accent-cyan">Sign Translation</span></h1>
+      <p class="slide-subtitle">A deterministic engine for classifying critical points by inspecting the sign change of f'(x).</p>
+
+      <div class="card" style="flex: 1; padding: 12px; overflow: hidden;">
+        <div class="vector-frame">
+          <img src="assets/svg/09_first_derivative_sign_chart.svg" alt="First derivative test sign chart">
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 11: Master Worked Example - Part 1 -->
+    <div class="slide" data-slide="11" data-title="Master Worked Example: f(x) = x³ - 3x (Part 1)">
+      <h1 class="slide-heading">Master Worked Example: <span class="accent-cyan">f(x) = x³ - 3x</span></h1>
+      <p class="slide-subtitle">Stage 1: Differentiation, complete factorization, and critical number isolation.</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-cyan">
+          <h3 style="font-size: 20px; color: var(--cyan); margin-bottom: 16px;">Step-by-Step Derivation</h3>
+
+          <div class="build-item" data-build="1">
+            <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">Step 1: Compute First Derivative</div>
+            <div class="math-block">
+              <span>f'(x) = d/dx [x³ - 3x] = 3x² - 3</span>
+            </div>
+          </div>
+
+          <div class="build-item" data-build="2">
+            <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">Step 2: Factor Completely</div>
+            <div class="math-block amber">
+              <span>f'(x) = 3(x² - 1) = 3(x - 1)(x + 1)</span>
+            </div>
+          </div>
+
+          <div class="build-item" data-build="3">
+            <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 4px;">Step 3: Set f'(x) = 0 and Check DNE</div>
+            <div class="math-block coral">
+              <span>3(x - 1)(x + 1) = 0 ⇒ x₁ = -1,  x₂ = +1</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">Since f(x) is a polynomial, f'(x) exists everywhere on ℝ (no singular points).</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; color: var(--text-main); margin-bottom: 12px;">Live iPad Annotation Canvas</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+            The lecturer uses this space to write the intermediate steps, show common factoring errors (e.g. dividing by zero), and set up the number line.
+          </p>
+          <div class="scratchpad-zone" style="flex: 1;">
+            <span class="scratchpad-label">Apple Pencil Work Area</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Partition real line at -1 and +1 with pencil ticks]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 12: Master Worked Example - Part 2 (Sign Chart & Graph Sync) -->
+    <div class="slide" data-slide="12" data-title="Master Worked Example: Sign Chart to Graph Morph">
+      <h1 class="slide-heading">Master Worked Example: <span class="accent-amber">Sign Chart to Graph</span></h1>
+      <p class="slide-subtitle">Stage 2: Translating algebraic sign intervals into verified extrema coordinates.</p>
+
+      <div class="grid-2col" style="flex: 1;">
+        <div class="card" style="padding: 8px;">
+          <div class="vector-frame">
+            <img src="assets/svg/10_worked_example_cubic.svg" alt="Worked example graph and sign analysis">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 18px; color: var(--cyan); margin-bottom: 10px;">Evaluation of Extrema Coordinates</h3>
+            <div class="math-block amber">
+              <span>At x = -1: f(-1) = (-1)³ - 3(-1) = -1 + 3 = +2</span>
+            </div>
+            <div class="math-block">
+              <span style="color: var(--amber); font-weight: 700;">⇒ LOCAL MAXIMUM AT (-1, 2)</span>
+            </div>
+
+            <div class="build-item" data-build="1">
+              <div class="math-block cyan">
+                <span>At x = +1: f(1) = (1)³ - 3(1) = 1 - 3 = -2</span>
+              </div>
+              <div class="math-block">
+                <span style="color: var(--cyan); font-weight: 700;">⇒ LOCAL MINIMUM AT (1, -2)</span>
+              </div>
+            </div>
+
+            <div class="build-item" data-build="2">
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-top: 10px;">
+                <strong>Geometric Synchronization:</strong> Notice how the roots of the derivative parabola $f'(x)$ coincide perfectly with the crest and trough of the cubic $f(x)$!
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 110px;">
+            <span class="scratchpad-label">Apple Pencil Check</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Draw vertical guide lines connecting f'=0 to f(x) peaks]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 13: Concavity and The Second Derivative -->
+    <div class="slide" data-slide="13" data-title="Concavity & Second Derivative">
+      <h1 class="slide-heading">Curvature &amp; Concavity: <span class="accent-cyan">The Second Derivative</span></h1>
+      <p class="slide-subtitle">f''(x) measures how fast the tangent slopes are changing: The bending of the curve.</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 10px;">
+          <div class="vector-frame">
+            <img src="assets/svg/11_second_derivative_concavity.svg" alt="Concavity and second derivative curvature">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <div class="math-block amber">
+              <span>Concave Down (∩): f''(c) &lt; 0</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-bottom: 14px;">
+              Slopes decrease (+ to 0 to -). Tangents lie ABOVE the curve. If f'(c) = 0, this geometric cage traps a <strong>LOCAL MAXIMUM</strong>.
+            </p>
+            <div class="build-item" data-build="1">
+              <div class="math-block">
+                <span>Concave Up (∪): f''(c) &gt; 0</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5;">
+                Slopes increase (- to 0 to +). Tangents lie BELOW the curve. If f'(c) = 0, this geometric cage traps a <strong>LOCAL MINIMUM</strong>.
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 110px;">
+            <span class="scratchpad-label">Physics Mnemonics</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: "Cup holds water = Concave Up = Minimum"]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 14: Second Derivative Test & Comparison Matrix -->
+    <div class="slide" data-slide="14" data-title="Second Derivative Test & Comparison">
+      <h1 class="slide-heading">The Second Derivative Test: <span class="accent-amber">Verification &amp; Limits</span></h1>
+      <p class="slide-subtitle">Evaluating f''(c) provides a single-point confirmation, but possesses critical failure modes.</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-amber">
+          <h3 style="font-size: 18px; color: var(--amber); margin-bottom: 12px;">Verification on f(x) = x³ - 3x</h3>
+          <div class="math-block">
+            <span>f''(x) = d/dx [3x² - 3] = 6x</span>
+          </div>
+
+          <div class="build-item" data-build="1">
+            <div style="font-size: 14px; color: var(--text-muted); margin-top: 10px;">Test Critical Point x = -1:</div>
+            <div class="math-block amber">
+              <span>f''(-1) = 6(-1) = -6 &lt; 0 ⇒ LOCAL MAXIMUM</span>
+            </div>
+          </div>
+
+          <div class="build-item" data-build="2">
+            <div style="font-size: 14px; color: var(--text-muted); margin-top: 10px;">Test Critical Point x = +1:</div>
+            <div class="math-block">
+              <span>f''(1) = 6(+1) = +6 &gt; 0 ⇒ LOCAL MINIMUM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; color: var(--coral); margin-bottom: 12px;">When Does the SDT Fail?</h3>
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 12px;">
+            If <strong>f''(c) = 0</strong> (or is undefined), the Second Derivative Test is completely <strong>INCONCLUSIVE</strong>!
+          </p>
+          <div class="math-block coral" style="font-size: 13px;">
+            <span>f(x)=x⁴ ⇒ f''(0)=0 (Min) | f(x)=-x⁴ ⇒ f''(0)=0 (Max) | f(x)=x³ ⇒ f''(0)=0 (Neither)</span>
+          </div>
+          <div class="build-item" data-build="3">
+            <p style="font-size: 13px; color: var(--cyan); font-weight: 700; margin-top: 10px;">
+              ⚡ Verdict: When SDT fails, ALWAYS fall back to the First Derivative Test!
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 15: Absolute Extrema on Closed Intervals -->
+    <div class="slide" data-slide="15" data-title="Absolute Extrema on Closed Intervals">
+      <h1 class="slide-heading">The Closed Interval Method: <span class="accent-coral">Endpoint Traps</span></h1>
+      <p class="slide-subtitle">Extreme Value Theorem guarantees extrema on [a, b]. But engineers often forget the boundaries!</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 8px;">
+          <div class="vector-frame">
+            <img src="assets/svg/12_closed_interval_endpoints.svg" alt="Closed interval method comparison on [-0.5, 2.5]">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 17px; color: var(--coral); margin-bottom: 10px;">The 3-Step Closed Interval Algorithm</h3>
+            <div class="math-block">
+              <span>1. Find all critical numbers c_i ∈ (a, b)</span>
+            </div>
+            <div class="math-block">
+              <span>2. Evaluate f(c_i) for interior candidates</span>
+            </div>
+            <div class="math-block coral">
+              <span>3. Evaluate boundary endpoints: f(a) and f(b)</span>
+            </div>
+            <div class="build-item" data-build="1">
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.5; margin-top: 10px;">
+                On $[-0.5, 2.5]$ for $f(x) = x^3 - 3x$, the absolute peak occurs at $x = 2.5$ ($y = 8.125$). An engineer who only checked $f'=0$ would miss the true peak stress by over 300%!
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 100px;">
+            <span class="scratchpad-label">Apple Pencil Check</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Emphasize discarding x = -1 since -1 is outside [-0.5, 2.5]]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 16: Engineering Optimization Application -->
+    <div class="slide" data-slide="16" data-title="Engineering Optimization: Maximum Power Transfer">
+      <h1 class="slide-heading">Real Engineering Optimization: <span class="accent-cyan">Max Power Transfer</span></h1>
+      <p class="slide-subtitle">Balancing voltage drop against current draw in power systems and renewable energy harvesters.</p>
+
+      <div class="grid-2col">
+        <div class="card" style="padding: 8px;">
+          <div class="vector-frame">
+            <img src="assets/svg/13_engineering_max_power.svg" alt="Circuit diagram and power characteristic curve">
+          </div>
+        </div>
+
+        <div class="card" style="display: flex; flex-direction: column; justify-content: space-between;">
+          <div>
+            <h3 style="font-size: 17px; color: var(--cyan); margin-bottom: 8px;">Analytical Derivation</h3>
+            <div class="math-block" style="font-size: 15px;">
+              <span>P(R_L) = V_s² · R_L · (R_s + R_L)⁻²</span>
+            </div>
+            <div class="build-item" data-build="1">
+              <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 2px;">Apply Quotient / Product Rule:</div>
+              <div class="math-block amber" style="font-size: 15px;">
+                <span>dP/dR_L = V_s² · (R_s - R_L) / (R_s + R_L)³</span>
+              </div>
+            </div>
+            <div class="build-item" data-build="2">
+              <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 2px;">Set dP/dR_L = 0:</div>
+              <div class="math-block coral" style="font-size: 15px;">
+                <span>R_s - R_L = 0  ⇒  R_L = R_s</span>
+              </div>
+              <p style="font-size: 13px; color: var(--text-muted); line-height: 1.4;">
+                For $R_L < R_s$, $P' > 0$ (rising). For $R_L > R_s$, $P' < 0$ (falling). By FDT, $R_L = R_s$ is the unique absolute maximum!
+              </p>
+            </div>
+          </div>
+
+          <div class="scratchpad-zone" style="height: 110px;">
+            <span class="scratchpad-label">Physical Impact</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Mention 50% efficiency limit; solar MPPT controllers]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 17: Guided Practice -->
+    <div class="slide" data-slide="17" data-title="Guided Practice: Sheet Metal Packaging">
+      <h1 class="slide-heading">Guided Practice: <span class="accent-amber">Packaging Optimization</span></h1>
+      <p class="slide-subtitle">A square sheet of aluminum (12 cm × 12 cm) has square corners of size x removed to fold a chassis.</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-amber">
+          <h3 style="font-size: 18px; color: var(--amber); margin-bottom: 12px;">Problem Formulation</h3>
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 12px;">
+            Find cut depth $x$ that maximizes volume $V(x)$ on its allowable domain $[0, 6]$.
+          </p>
+
+          <div class="build-item" data-build="1">
+            <div class="math-block">
+              <span>V(x) = x(12 - 2x)² = 4x(6 - x)² = 4(x³ - 12x² + 36x)</span>
+            </div>
+          </div>
+
+          <div class="build-item" data-build="2">
+            <div class="math-block amber">
+              <span>Hint 1: V'(x) = 12(x² - 8x + 12) = 12(x - 2)(x - 6)</span>
+            </div>
+          </div>
+
+          <div class="build-item" data-build="3">
+            <div class="math-block coral">
+              <span>Hint 2: Critical numbers are x = 2 and x = 6</span>
+            </div>
+            <p style="font-size: 13px; color: var(--text-muted);">Compare: V(0)=0, V(6)=0, V(2)=2(8)² = 128 cm³.</p>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; color: var(--text-main); margin-bottom: 12px;">Student Solve &amp; Lecturer Annotation</h3>
+          <p style="font-size: 14px; color: var(--text-muted); line-height: 1.5; margin-bottom: 12px;">
+            Allow 3-4 minutes for student calculation. Use Apple Pencil to sketch sheet unfolding and verify boundary behavior.
+          </p>
+          <div class="scratchpad-zone" style="flex: 1;">
+            <span class="scratchpad-label">Apple Pencil Work Area</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Sketch square sheet with corner cutouts x by x]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 18: Independent Practice Challenge -->
+    <div class="slide" data-slide="18" data-title="Independent Practice Challenge">
+      <h1 class="slide-heading">Independent Engineering Challenge: <span class="accent-coral">Beam Deflection</span></h1>
+      <p class="slide-subtitle">A simply supported beam of length L under uniform load w has elastic deflection curve y(x).</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-coral">
+          <h3 style="font-size: 18px; color: var(--coral); margin-bottom: 12px;">Civil / Mechanical Problem</h3>
+          <div class="math-block" style="font-size: 15px;">
+            <span>y(x) = (w₀ / 24EI) · [x⁴ - 2L x³ + L³ x],  x ∈ [0, L]</span>
+          </div>
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.6; margin-bottom: 14px;">
+            <strong>Task:</strong><br>
+            1. Differentiate $y(x)$ with respect to $x$.<br>
+            2. Prove that the maximum deflection occurs exactly at the midpoint $x = L/2$.<br>
+            3. Evaluate maximum deflection $y_{\max}$ in terms of $w_0, L, E, I$.
+          </p>
+          <div class="build-item" data-build="1">
+            <div class="math-block">
+              <span>Solution Key: y'(L/2) = k[4(L/2)³ - 6L(L/2)² + L³] = 0</span>
+            </div>
+            <div class="math-block amber">
+              <span>y_max = (5 w₀ L⁴) / (384 E I)  at  x = L/2</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 18px; color: var(--text-main); margin-bottom: 12px;">Apple Pencil Calculation Pad</h3>
+          <div class="scratchpad-zone" style="flex: 1;">
+            <span class="scratchpad-label">Active Scratchpad</span>
+            <p style="font-size: 12px; color: var(--text-dim);">[Lecturer: Work out factoring of 4x³ - 6Lx² + L³ = (2x - L)(2x² - 2Lx - L²)]</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 19: Algorithmic Flowchart -->
+    <div class="slide" data-slide="19" data-title="The Engineering Optimization Protocol">
+      <h1 class="slide-heading">The Engineering Protocol: <span class="accent-cyan">Algorithmic Decision Map</span></h1>
+      <p class="slide-subtitle">A fail-safe procedural pipeline from physical equation to verified optimum.</p>
+
+      <div class="card" style="flex: 1; padding: 10px; overflow: hidden;">
+        <div class="vector-frame">
+          <img src="assets/svg/14_optimization_flowchart.svg" alt="Optimization flowchart and test matrix">
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 20: Conceptual Exit Ticket -->
+    <div class="slide" data-slide="20" data-title="Conceptual Exit Ticket & Diagnostic Quiz">
+      <h1 class="slide-heading">Exit Ticket: <span class="accent-amber">Misconception Diagnostics</span></h1>
+      <p class="slide-subtitle">Three rapid conceptual checks to verify mastery before leaving the lecture hall.</p>
+
+      <div class="grid-3col">
+        <div class="card">
+          <div style="font-size: 13px; font-weight: 700; color: var(--cyan); margin-bottom: 8px;">Question 1</div>
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.5; margin-bottom: 14px;">
+            "If $f'(3) = 0$, does $f(x)$ definitely possess a local maximum or minimum at $x = 3$?"
+          </p>
+          <div class="build-item" data-build="1">
+            <div class="math-block coral" style="font-size: 13px;">
+              <span>NO! e.g. f(x) = (x-3)³ has f'(3)=0 but is an inflection terrace.</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 13px; font-weight: 700; color: var(--amber); margin-bottom: 8px;">Question 2</div>
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.5; margin-bottom: 14px;">
+            "If $f'(c) = 0$ and $f''(c) = 0$, what does the Second Derivative Test conclude?"
+          </p>
+          <div class="build-item" data-build="2">
+            <div class="math-block amber" style="font-size: 13px;">
+              <span>INCONCLUSIVE! Must fall back to First Derivative Test (Sign Chart).</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div style="font-size: 13px; font-weight: 700; color: var(--coral); margin-bottom: 8px;">Question 3</div>
+          <p style="font-size: 14px; color: var(--text-main); line-height: 1.5; margin-bottom: 14px;">
+            "Can an absolute maximum occur at an $x$ where $f'(x) \ne 0$?"
+          </p>
+          <div class="build-item" data-build="3">
+            <div class="math-block" style="font-size: 13px;">
+              <span>YES! At domain endpoints or points where f'(x) does not exist (cusps/corners).</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 21: Full Reference Solutions -->
+    <div class="slide" data-slide="21" data-title="Worked Solutions & Derivation Reference">
+      <h1 class="slide-heading">Reference Appendix: <span class="accent-cyan">Complete Solutions</span></h1>
+      <p class="slide-subtitle">Rigorously verified solutions for all guided and independent exercises.</p>
+
+      <div class="grid-2col-equal">
+        <div class="card">
+          <h3 style="font-size: 17px; color: var(--cyan); margin-bottom: 10px;">Exercise 1: Packaging Box</h3>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+            • Objective: Maximize $V(x) = 4(x^3 - 12x^2 + 36x)$ on $[0, 6]$.<br>
+            • $V'(x) = 12(x-2)(x-6) = 0 \implies x = 2 \in (0, 6)$.<br>
+            • Candidate check:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;$V(0) = 0$<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;$V(6) = 0$<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;$V(2) = 2(8)^2 = 128\,\text{cm}^3$.<br>
+            • Conclusion: Absolute maximum volume is $128\,\text{cm}^3$ at cut size $x = 2\,\text{cm}$.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3 style="font-size: 17px; color: var(--coral); margin-bottom: 10px;">Exercise 2: Beam Deflection</h3>
+          <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6;">
+            • $y(x) = k(x^4 - 2Lx^3 + L^3x)$ with $k = w_0/(24EI)$.<br>
+            • $y'(x) = k(4x^3 - 6Lx^2 + L^3) = k(2x - L)(2x^2 - 2Lx - L^2)$.<br>
+            • Roots in $[0, L]$: $2x - L = 0 \implies x = L/2$. (Other quadratic roots fall outside $[0, L]$).<br>
+            • Value at $x = L/2$:<br>
+            &nbsp;&nbsp;&nbsp;&nbsp;$y(L/2) = k(L^4/16 - 2L^4/8 + L^4/2) = k(5L^4/16) = \frac{5 w_0 L^4}{384 E I}$.<br>
+            • Verified boundary check: $y(0) = 0$, $y(L) = 0$. Absolute maximum deflection confirmed!
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SLIDE 22: Closing Synthesis & Next Horizon -->
+    <div class="slide" data-slide="22" data-title="Closing Synthesis & Next Horizon">
+      <h1 class="slide-heading">The Next Horizon: <span class="accent-cyan">Multivariable Optimization</span></h1>
+      <p class="slide-subtitle">From one-dimensional curves to high-dimensional engineering manifolds.</p>
+
+      <div class="grid-2col-equal">
+        <div class="card highlight-cyan">
+          <h3 style="font-size: 20px; color: #FFF; margin-bottom: 14px;">Today's Single-Variable Mastery</h3>
+          <div style="font-size: 14px; color: var(--text-muted); line-height: 1.7;">
+            ✓ Fermat's Theorem: $f'(c) = 0$ identifies stationary turning candidates.<br>
+            ✓ Singularities: $f'(c)$ DNE harbors crucial corners and stress cusps.<br>
+            ✓ First Derivative Test: Sign transition $(+) \to (-)$ proves a maximum.<br>
+            ✓ Second Derivative Test: Curvature $f''(c) < 0$ guarantees a peak.<br>
+            ✓ Closed Boundaries: Endpoints must ALWAYS be evaluated on $[a, b]$.
+          </div>
+        </div>
+
+        <div class="card highlight-amber">
+          <h3 style="font-size: 20px; color: var(--amber); margin-bottom: 14px;">Next Lecture: Multivariable Calculus</h3>
+          <div style="font-size: 14px; color: var(--text-muted); line-height: 1.7;">
+            ⚡ Gradient Vector: $\nabla f(x, y) = \mathbf{0}$ replaces $f'(x) = 0$.<br>
+            ⚡ Hessian Matrix: $\mathbf{H} f(x, y)$ replaces second derivative concavity.<br>
+            ⚡ Saddle Points: Landscapes where one direction peaks while the other dips.<br>
+            ⚡ Lagrange Multipliers: Optimizing under physical equality constraints $g(x,y)=k$.
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Apple Pencil Annotation Layer -->
+  <canvas id="annotation-layer"></canvas>
+
+  <!-- Lecturer Toolbar -->
+  <div id="toolbar">
+    <button class="btn-tool" id="btn-prev" title="Previous Slide (← / Space)">◀</button>
+    <button class="btn-tool" id="btn-next" title="Next Build / Slide (→ / Enter)">▶</button>
+    <button class="btn-tool" id="btn-pen" title="Apple Pencil / Drawing Mode (C)">✏️</button>
+    <button class="btn-tool" id="btn-eraser" title="Eraser Mode (E)">🧹</button>
+    <button class="btn-tool" id="btn-clear" title="Clear Canvas">🗑️</button>
+    <button class="btn-tool" id="btn-notes" title="Toggle Speaker Notes (S)">📝</button>
+    <button class="btn-tool" id="btn-grid" title="Slide Overview Grid (G)">⊞</button>
+    <button class="btn-tool" id="btn-fullscreen" title="Toggle Fullscreen (F)">⛶</button>
+  </div>
+
+  <!-- Speaker Notes Drawer -->
+  <div id="speaker-notes-panel">
+    <div class="notes-title" id="notes-slide-title">Slide 01: Speaker Notes</div>
+    <div class="notes-content" id="notes-body">
+      Welcome students. Introduce the hook. Emphasize that optimization is the crown jewel of differential calculus.
+    </div>
+  </div>
+
+  <!-- Grid Overview Modal -->
+  <div id="grid-modal">
+    <div class="grid-header">
+      <h2 style="font-size: 22px; color: var(--cyan);">Lecture Slide Navigator</h2>
+      <button class="btn-tool" id="btn-close-grid" style="font-size: 20px;">✕</button>
+    </div>
+    <div class="grid-thumbnails" id="grid-thumbs-container"></div>
+  </div>
+</div>
+
+<script>
+  // Speaker Notes Data Store (Complete 22 Slides)
+  const speakerNotesData = {
+    1: "<strong>Hook Pacing (2 mins):</strong> Start immediately with the visual hook. Ask students: 'If you were programming an autonomous rover or designing a battery voltage controller, where does the state change its mind?' Point to the peak and trough. Highlight the tangent vector rotating as it crosses the peak. Emphasize that vanishing slope f'(x)=0 is only half the story—singularities where f' fails also matter.",
+    2: "<strong>Architecture (1 min):</strong> Give students the roadmap. Engineering students appreciate knowing the destination. Frame the 4 pillars: Geometry, Classification, Boundaries, and Physical Application.",
+    3: "<strong>Physical Systems (2 mins):</strong> Connect math to multiple engineering disciplines. Mechanical: Potential energy U(x) where force F = -dU/dx = 0; Electrical: Impedance matching; Chemical: Reaction kinetics vs degradation.",
+    4: "<strong>Local vs Absolute (2.5 mins):</strong> Common misconception: thinking a local max is the highest point everywhere. Point to the graph: the right boundary point b is much higher than the interior local peak! Use Apple Pencil to circle both.",
+    5: "<strong>Increasing/Decreasing (2 mins):</strong> Review MVT connection. Ask: 'Why must f'(x) > 0 mean increasing?' Sketch a secant line with positive slope. Explain that turning around requires crossing zero.",
+    6: "<strong>Fermat's Theorem (2.5 mins):</strong> Historical context (Pierre de Fermat, 1636). Emphasize that Fermat's theorem only applies to INTERIOR points where the derivative EXISTS. Mention that this theorem gives candidates, not guarantees.",
+    7: "<strong>Critical Numbers (2 mins):</strong> Drill this definition: 1. f'(c) = 0 OR 2. f'(c) DNE, AND c must be in the domain! Emphasize domain checking—this is a classic exam trap.",
+    8: "<strong>Singular Points DNE (2.5 mins):</strong> Walk through |x| and x^(2/3). These are vital in mechanics (impact, shock waves) and circuits (diode turn-on). Extrema occur where tangents fail!",
+    9: "<strong>The x³ Trap (2.5 mins):</strong> This is the most crucial conceptual slide of the lecture. Settle on the graph. f'(0) = 0, but it is NOT an extremum. Have students calculate 3(-0.1)² and 3(0.1)². Both are positive! The curve pauses and keeps rising.",
+    10: "<strong>First Derivative Test (3 mins):</strong> Explain the visual sign chart. Rising then falling (+ to -) forms a mountain. Falling then rising (- to +) forms a valley. No sign change means a terrace/plateau.",
+    11: "<strong>Worked Example 1 (3 mins):</strong> Guide students through f(x) = x³ - 3x. Don't rush the factoring. 3(x² - 1) = 3(x-1)(x+1). Write out the critical numbers x = -1 and x = +1.",
+    12: "<strong>Worked Example 2 (3 mins):</strong> Settle on the synchronized dual graph. Show how the parabola f'(x) crosses the zero line at the exact x-coordinates where the cubic f(x) has horizontal tangents. Calculate coordinates (-1, 2) and (1, -2).",
+    13: "<strong>Concavity & f''(x) (2.5 mins):</strong> Define concavity as the rate of change of slopes. If f''(x) < 0, slopes are falling (+ to 0 to -). This creates a downward bowl that traps a maximum at the stationary point.",
+    14: "<strong>Second Derivative Test (2.5 mins):</strong> Compute f''(x) = 6x. Evaluate at -1 (=-6 < 0 => Max) and at +1 (=+6 > 0 => Min). Explain why f''(c) = 0 fails: give x⁴ and -x⁴ as examples.",
+    15: "<strong>Closed Interval Method (3 mins):</strong> Teach the 3-step EVT protocol. Settle on the table. Point out that x = -1 is discarded because it falls outside [-0.5, 2.5]. Show how the endpoint x = 2.5 yields y = 8.125, smashing the interior value of -2.",
+    16: "<strong>Max Power Transfer (4 mins):</strong> This is an iconic engineering milestone. Differentiate P(RL) = Vs² RL / (Rs + RL)² using the quotient rule. Show that dP/dRL = 0 leads directly to RL = Rs. Explain impedance matching in audio, RF, and solar.",
+    17: "<strong>Guided Practice (4 mins):</strong> Sheet metal packaging box. Let students attempt the derivative. Reveal hints sequentially. Critical numbers x = 2 and x = 6. Max volume is 128 cm³ at x = 2.",
+    18: "<strong>Independent Challenge (4 mins):</strong> Beam deflection equation. Give students 3 minutes to work. Midpoint x = L/2 symmetry. Maximum deflection is 5w₀L⁴ / (384EI).",
+    19: "<strong>Flowchart Synthesis (2 mins):</strong> Review the algorithmic decision tree. Students can take a photo or screenshot of this slide on their iPads for study reference.",
+    20: "<strong>Exit Ticket (2.5 mins):</strong> Fire the 3 diagnostic questions. Cold call or use a quick show of hands. Reinforce the difference between stationary points and true extrema.",
+    21: "<strong>Reference Solutions (1 min):</strong> Reassure students that complete algebraic proofs are preserved in their lecture notes and slide deck repository.",
+    22: "<strong>Next Horizon (1 min):</strong> Preview multivariable calculus: Gradients ∇f = 0 and Hessian matrices. End on time with energy!"
+  };
+
+  // State Management
+  let currentSlide = 1;
+  const totalSlides = 22;
+  let currentBuild = 0;
+  let isDrawingMode = false;
+  let isEraserMode = false;
+  let penColor = '#38BDF8';
+  let penWidth = 3;
+
+  // DOM Elements
+  const slides = document.querySelectorAll('.slide');
+  const slideNumEl = document.getElementById('slide-num');
+  const headerTitleEl = document.getElementById('header-title');
+  const speakerNotesPanel = document.getElementById('speaker-notes-panel');
+  const notesSlideTitleEl = document.getElementById('notes-slide-title');
+  const notesBodyEl = document.getElementById('notes-body');
+  const gridModal = document.getElementById('grid-modal');
+  const gridThumbsContainer = document.getElementById('grid-thumbs-container');
+  const canvas = document.getElementById('annotation-layer');
+  const ctx = canvas.getContext('2d');
+
+  // Canvas Sizing
+  function resizeCanvas() {
+    canvas.width = canvas.parentElement.clientWidth;
+    canvas.height = canvas.parentElement.clientHeight - 56;
+  }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
+
+  // Populate Slide Grid Thumbnails
+  function populateGrid() {
+    gridThumbsContainer.innerHTML = '';
+    slides.forEach((s, idx) => {
+      const num = idx + 1;
+      const title = s.getAttribute('data-title') || `Slide ${num}`;
+      const thumb = document.createElement('div');
+      thumb.className = 'grid-thumb';
+      thumb.innerHTML = `
+        <div class="grid-thumb-num">SLIDE ${String(num).padStart(2, '0')}</div>
+        <div class="grid-thumb-title">${title}</div>
+      `;
+      thumb.onclick = () => {
+        goToSlide(num);
+        closeGrid();
+      };
+      gridThumbsContainer.appendChild(thumb);
+    });
+  }
+  populateGrid();
+
+  // Navigation Logic
+  function updateSlideUI() {
+    slides.forEach(s => s.classList.remove('active'));
+    const activeSlide = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+    if (activeSlide) {
+      activeSlide.classList.add('active');
+      const title = activeSlide.getAttribute('data-title') || '';
+      headerTitleEl.textContent = `${String(currentSlide).padStart(2, '0')}. ${title}`;
+      slideNumEl.textContent = `${String(currentSlide).padStart(2, '0')} / ${totalSlides}`;
+
+      // Reset build items for current slide
+      currentBuild = 0;
+      const buildItems = activeSlide.querySelectorAll('.build-item');
+      buildItems.forEach(item => item.classList.remove('revealed'));
+
+      // Update speaker notes
+      notesSlideTitleEl.textContent = `Slide ${String(currentSlide).padStart(2, '0')}: ${title}`;
+      notesBodyEl.innerHTML = speakerNotesData[currentSlide] || "No speaker notes recorded for this slide.";
+    }
+  }
+
+  function advance() {
+    const activeSlide = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+    const buildItems = activeSlide ? activeSlide.querySelectorAll('.build-item') : [];
+    const unrevealed = Array.from(buildItems).filter(item => !item.classList.contains('revealed'));
+
+    if (unrevealed.length > 0) {
+      unrevealed[0].classList.add('revealed');
+      currentBuild++;
+    } else {
+      if (currentSlide < totalSlides) {
+        currentSlide++;
+        updateSlideUI();
+      }
+    }
+  }
+
+  function retreat() {
+    const activeSlide = document.querySelector(`.slide[data-slide="${currentSlide}"]`);
+    const revealedItems = activeSlide ? Array.from(activeSlide.querySelectorAll('.build-item.revealed')) : [];
+
+    if (revealedItems.length > 0) {
+      revealedItems[revealedItems.length - 1].classList.remove('revealed');
+      currentBuild--;
+    } else {
+      if (currentSlide > 1) {
+        currentSlide--;
+        updateSlideUI();
+      }
+    }
+  }
+
+  function goToSlide(n) {
+    if (n >= 1 && n <= totalSlides) {
+      currentSlide = n;
+      updateSlideUI();
+    }
+  }
+
+  // Apple Pencil Canvas Drawing Engine
+  let isDrawing = false;
+  let lastX = 0;
+  let lastY = 0;
+
+  function startDrawing(e) {
+    if (!isDrawingMode) return;
+    isDrawing = true;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    lastX = clientX - rect.left;
+    lastY = clientY - rect.top;
+  }
+
+  function draw(e) {
+    if (!isDrawing || !isDrawingMode) return;
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const currentX = clientX - rect.left;
+    const currentY = clientY - rect.top;
+
+    ctx.beginPath();
+    ctx.moveTo(lastX, lastY);
+    ctx.lineTo(currentX, currentY);
+
+    if (isEraserMode) {
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.lineWidth = 24;
+      ctx.lineCap = 'round';
+      ctx.stroke();
+    } else {
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.strokeStyle = penColor;
+      ctx.lineWidth = penWidth;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.stroke();
+    }
+
+    lastX = currentX;
+    lastY = currentY;
+  }
+
+  function stopDrawing() {
+    isDrawing = false;
+  }
+
+  canvas.addEventListener('mousedown', startDrawing);
+  canvas.addEventListener('mousemove', draw);
+  canvas.addEventListener('mouseup', stopDrawing);
+  canvas.addEventListener('mouseleave', stopDrawing);
+
+  canvas.addEventListener('touchstart', startDrawing, { passive: false });
+  canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e); }, { passive: false });
+  canvas.addEventListener('touchend', stopDrawing);
+
+  // Button Listeners
+  document.getElementById('btn-next').onclick = advance;
+  document.getElementById('btn-prev').onclick = retreat;
+
+  const btnPen = document.getElementById('btn-pen');
+  const btnEraser = document.getElementById('btn-eraser');
+  const btnClear = document.getElementById('btn-clear');
+
+  btnPen.onclick = () => {
+    isDrawingMode = !isDrawingMode;
+    isEraserMode = false;
+    canvas.classList.toggle('drawing-active', isDrawingMode);
+    btnPen.classList.toggle('active-pen', isDrawingMode);
+    btnEraser.classList.remove('active');
+  };
+
+  btnEraser.onclick = () => {
+    if (!isDrawingMode) {
+      isDrawingMode = true;
+      canvas.classList.add('drawing-active');
+    }
+    isEraserMode = !isEraserMode;
+    btnEraser.classList.toggle('active', isEraserMode);
+    btnPen.classList.toggle('active-pen', isDrawingMode && !isEraserMode);
+  };
+
+  btnClear.onclick = () => {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  };
+
+  const btnNotes = document.getElementById('btn-notes');
+  btnNotes.onclick = () => {
+    speakerNotesPanel.classList.toggle('open');
+    btnNotes.classList.toggle('active');
+  };
+
+  const btnGrid = document.getElementById('btn-grid');
+  btnGrid.onclick = () => {
+    gridModal.classList.add('open');
+  };
+
+  function closeGrid() {
+    gridModal.classList.remove('open');
+  }
+  document.getElementById('btn-close-grid').onclick = closeGrid;
+
+  document.getElementById('btn-fullscreen').onclick = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(() => {});
+    } else {
+      document.exitFullscreen().catch(() => {});
+    }
+  };
+
+  // Keyboard Shortcuts
+  window.addEventListener('keydown', (e) => {
+    if (gridModal.classList.contains('open')) {
+      if (e.key === 'Escape') closeGrid();
+      return;
+    }
+
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+      advance();
+    } else if (e.key === 'ArrowLeft' || e.key === 'Backspace') {
+      retreat();
+    } else if (e.key === 'c' || e.key === 'C') {
+      btnPen.click();
+    } else if (e.key === 'e' || e.key === 'E') {
+      btnEraser.click();
+    } else if (e.key === 's' || e.key === 'S') {
+      btnNotes.click();
+    } else if (e.key === 'g' || e.key === 'G') {
+      btnGrid.click();
+    } else if (e.key === 'f' || e.key === 'F') {
+      document.getElementById('btn-fullscreen').click();
+    }
+  });
+
+  // Touch Swipe on Slide Stage
+  let touchStartX = 0;
+  window.addEventListener('touchstart', (e) => {
+    if (isDrawingMode) return;
+    touchStartX = e.changedTouches[0].screenX;
+  }, { passive: true });
+
+  window.addEventListener('touchend', (e) => {
+    if (isDrawingMode) return;
+    const touchEndX = e.changedTouches[0].screenX;
+    if (touchEndX < touchStartX - 60) {
+      advance();
+    } else if (touchEndX > touchStartX + 60) {
+      retreat();
+    }
+  }, { passive: true });
+
+  // Initial UI Render
+  updateSlideUI();
+</script>
+
+</body>
+</html>

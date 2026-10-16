@@ -1,0 +1,102 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <rect width="960" height="540" fill="#0B0F19" rx="12"/>
+  
+  <defs>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#F43F5E" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#F43F5E"/>
+    </marker>
+    <marker id="arrowSlate" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#64748B"/>
+    </marker>
+  </defs>
+
+
+  <text x="480" y="45" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">THE ENGINEERING OPTIMIZATION PROTOCOL</text>
+  <text x="480" y="72" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="14" text-anchor="middle">Deterministic 4-Step Algorithmic Pipeline</text>
+
+  <!-- Step 1: Model & Domain -->
+  <g transform="translate(60, 110)">
+    <rect width="180" height="110" rx="10" fill="#111827" stroke="#38BDF8" stroke-width="2"/>
+    <circle cx="20" cy="20" r="12" fill="#38BDF8"/>
+    <text x="20" y="25" fill="#0B0F19" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="800" text-anchor="middle">1</text>
+    <text x="95" y="45" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">MODEL &amp; DOMAIN</text>
+    <text x="90" y="70" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">Express y = f(x)</text>
+    <text x="90" y="88" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">Define physical [a, b]</text>
+  </g>
+  <line x1="240" y1="165" x2="280" y2="165" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+  <!-- Step 2: Differentiate & Critical Points -->
+  <g transform="translate(290, 110)">
+    <rect width="180" height="110" rx="10" fill="#111827" stroke="#38BDF8" stroke-width="2"/>
+    <circle cx="20" cy="20" r="12" fill="#38BDF8"/>
+    <text x="20" y="25" fill="#0B0F19" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="800" text-anchor="middle">2</text>
+    <text x="95" y="45" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">CRITICAL POINTS</text>
+    <text x="90" y="70" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">Compute f'(x)</text>
+    <text x="90" y="88" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="600" text-anchor="middle">Solve f'(c) = 0 or DNE</text>
+  </g>
+  <line x1="470" y1="165" x2="510" y2="165" stroke="#38BDF8" stroke-width="2.5" marker-end="url(#arrowCyan)"/>
+
+  <!-- Step 3: Classification -->
+  <g transform="translate(520, 110)">
+    <rect width="180" height="110" rx="10" fill="#111827" stroke="#F59E0B" stroke-width="2"/>
+    <circle cx="20" cy="20" r="12" fill="#F59E0B"/>
+    <text x="20" y="25" fill="#0B0F19" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="800" text-anchor="middle">3</text>
+    <text x="95" y="45" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">CLASSIFY EXTREMA</text>
+    <text x="90" y="70" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">Option A: 1st Deriv Test</text>
+    <text x="90" y="88" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">Option B: 2nd Deriv Test</text>
+  </g>
+  <line x1="700" y1="165" x2="740" y2="165" stroke="#F59E0B" stroke-width="2.5" marker-end="url(#arrowAmber)"/>
+
+  <!-- Step 4: Boundary & Verdict -->
+  <g transform="translate(750, 110)">
+    <rect width="160" height="110" rx="10" fill="#111827" stroke="#F43F5E" stroke-width="2"/>
+    <circle cx="20" cy="20" r="12" fill="#F43F5E"/>
+    <text x="20" y="25" fill="#0B0F19" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="800" text-anchor="middle">4</text>
+    <text x="85" y="45" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">BOUNDARIES</text>
+    <text x="80" y="70" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">Test endpoints f(a), f(b)</text>
+    <text x="80" y="88" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" text-anchor="middle">Global Max/Min</text>
+  </g>
+
+  <!-- Bottom Decision Matrix Box -->
+  <g transform="translate(60, 260)">
+    <rect width="850" height="230" rx="12" fill="#111827" stroke="#334155" stroke-width="1.5"/>
+    <text x="425" y="32" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="700" text-anchor="middle">EXTREMA TEST SELECTION MATRIX</text>
+
+    <!-- Sub-cards -->
+    <g transform="translate(30, 50)">
+      <rect width="370" height="150" rx="8" fill="#1E293B" stroke="#38BDF8" stroke-width="1"/>
+      <text x="185" y="30" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">FIRST DERIVATIVE TEST (FDT)</text>
+      <text x="20" y="60" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13">• Evaluates sign changes of f'(x) across critical values.</text>
+      <text x="20" y="85" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13">• WORKS EVERYWHERE (even when f'(c) DNE!).</text>
+      <text x="20" y="110" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13">• Detects corners, cusps, and stationary plateaus.</text>
+      <text x="20" y="135" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600">✓ The Universal Tool for Engineers</text>
+    </g>
+
+    <g transform="translate(450, 50)">
+      <rect width="370" height="150" rx="8" fill="#1E293B" stroke="#F59E0B" stroke-width="1"/>
+      <text x="185" y="30" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700" text-anchor="middle">SECOND DERIVATIVE TEST (SDT)</text>
+      <text x="20" y="60" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13">• Evaluates single-point concavity f''(c).</text>
+      <text x="20" y="85" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13">• Extremely fast for simple polynomials.</text>
+      <text x="20" y="110" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="13">• FAILS completely if f''(c) = 0 or undefined.</text>
+      <text x="20" y="135" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600">⚡ Fast Shortcut, but fallback to FDT required</text>
+    </g>
+  </g>
+</svg>

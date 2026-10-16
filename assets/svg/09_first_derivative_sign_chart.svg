@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <rect width="960" height="540" fill="#0B0F19" rx="12"/>
+  
+  <defs>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#F43F5E" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#F43F5E"/>
+    </marker>
+    <marker id="arrowSlate" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#64748B"/>
+    </marker>
+  </defs>
+
+
+  <text x="480" y="55" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">THE FIRST DERIVATIVE TEST (FDT)</text>
+  <text x="480" y="85" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="15" text-anchor="middle">Translating the sign of f'(x) into turning behavior</text>
+
+  <!-- Case 1: Max (+ to -) -->
+  <g transform="translate(60, 120)">
+    <rect width="250" height="340" rx="10" fill="#111827" stroke="#F59E0B" stroke-width="1.5"/>
+    <text x="125" y="35" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">LOCAL MAXIMUM</text>
+    <!-- Number line -->
+    <line x1="25" y1="110" x2="225" y2="110" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+    <circle cx="125" cy="110" r="6" fill="#F59E0B"/>
+    <text x="125" y="135" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="14" text-anchor="middle">c (f'=0)</text>
+    <!-- Signs -->
+    <text x="65" y="95" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">+</text>
+    <text x="185" y="95" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">-</text>
+    <!-- Shape diagram -->
+    <path d="M 45 230 L 125 170 L 205 230" fill="none" stroke="#F59E0B" stroke-width="3.5"/>
+    <text x="65" y="260" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Rising ↗</text>
+    <text x="185" y="260" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Falling ↘</text>
+    <text x="125" y="310" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Sign shifts: (+) → (-)</text>
+  </g>
+
+  <!-- Case 2: Min (- to +) -->
+  <g transform="translate(355, 120)">
+    <rect width="250" height="340" rx="10" fill="#111827" stroke="#38BDF8" stroke-width="1.5"/>
+    <text x="125" y="35" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">LOCAL MINIMUM</text>
+    <!-- Number line -->
+    <line x1="25" y1="110" x2="225" y2="110" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+    <circle cx="125" cy="110" r="6" fill="#38BDF8"/>
+    <text x="125" y="135" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="14" text-anchor="middle">c (f'=0)</text>
+    <!-- Signs -->
+    <text x="65" y="95" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">-</text>
+    <text x="185" y="95" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">+</text>
+    <!-- Shape diagram -->
+    <path d="M 45 170 L 125 230 L 205 170" fill="none" stroke="#38BDF8" stroke-width="3.5"/>
+    <text x="65" y="260" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Falling ↘</text>
+    <text x="185" y="260" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Rising ↗</text>
+    <text x="125" y="310" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Sign shifts: (-) → (+)</text>
+  </g>
+
+  <!-- Case 3: Neither (No change) -->
+  <g transform="translate(650, 120)">
+    <rect width="250" height="340" rx="10" fill="#111827" stroke="#64748B" stroke-width="1.5"/>
+    <text x="125" y="35" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">NEITHER (TERRACE)</text>
+    <!-- Number line -->
+    <line x1="25" y1="110" x2="225" y2="110" stroke="#475569" stroke-width="2" marker-end="url(#arrowSlate)"/>
+    <circle cx="125" cy="110" r="6" fill="#64748B"/>
+    <text x="125" y="135" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="14" text-anchor="middle">c (f'=0)</text>
+    <!-- Signs -->
+    <text x="65" y="95" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">+</text>
+    <text x="185" y="95" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="22" font-weight="700" text-anchor="middle">+</text>
+    <!-- Shape diagram -->
+    <path d="M 45 220 Q 125 200, 125 180 Q 125 160, 205 140" fill="none" stroke="#64748B" stroke-width="3.5"/>
+    <text x="125" y="260" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Continuous climb</text>
+    <text x="125" y="310" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">Sign DOES NOT CHANGE</text>
+  </g>
+</svg>

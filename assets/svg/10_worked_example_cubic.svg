@@ -1,0 +1,120 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 960 540" width="100%" height="100%">
+  <rect width="960" height="540" fill="#0B0F19" rx="12"/>
+  
+  <defs>
+    <linearGradient id="cyanGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#06B6D4" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#38BDF8" stop-opacity="1"/>
+    </linearGradient>
+    <linearGradient id="amberGlow" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#F59E0B" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#F43F5E" stop-opacity="1"/>
+    </linearGradient>
+    <filter id="glowEffect" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+    <marker id="arrowCyan" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrowAmber" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#F43F5E"/>
+    </marker>
+    <marker id="arrowSlate" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto">
+      <path d="M1,1 L7,4 L1,7 Z" fill="#64748B"/>
+    </marker>
+  </defs>
+
+
+  <!-- Left Side: Graph of f(x) and f'(x) -->
+  <g transform="translate(40, 20)">
+    <text x="240" y="25" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">Geometric Synchronization</text>
+
+    <!-- Axes -->
+    <line x1="40" y1="260" x2="440" y2="260" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowSlate)"/>
+    <line x1="240" y1="480" x2="240" y2="40" stroke="#334155" stroke-width="1.5" marker-end="url(#arrowSlate)"/>
+
+    <!-- Scale ticks -->
+    <!-- x = -1 at x=140, x = 1 at x=340 -->
+    <line x1="140" y1="255" x2="140" y2="265" stroke="#94A3B8" stroke-width="2"/>
+    <text x="140" y="280" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">-1</text>
+    <line x1="340" y1="255" x2="340" y2="265" stroke="#94A3B8" stroke-width="2"/>
+    <text x="340" y="280" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">+1</text>
+
+    <!-- Curve f(x) = x^3 - 3x (scaled: y=-2 -> y=380, y=2 -> y=140) -->
+    <path d="M 60 460 C 100 280, 120 140, 140 140 C 180 140, 200 260, 240 260 C 280 260, 300 380, 340 380 C 360 380, 380 240, 420 60"
+          fill="none" stroke="#38BDF8" stroke-width="3.5" filter="url(#glowEffect)"/>
+    <text x="430" y="80" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">f(x)</text>
+
+    <!-- Derivative f'(x) = 3x^2 - 3 (parabola opening up, roots at 140 and 340, vertex at (240, 350)) -->
+    <path d="M 60 80 Q 240 440, 420 80"
+          fill="none" stroke="#F59E0B" stroke-width="2.5" stroke-dasharray="6,4"/>
+    <text x="430" y="120" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">f'(x)</text>
+
+    <!-- Vertical sync dashed lines -->
+    <line x1="140" y1="40" x2="140" y2="480" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,3"/>
+    <line x1="340" y1="40" x2="340" y2="480" stroke="#F59E0B" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+    <!-- Key Points -->
+    <circle cx="140" cy="140" r="7" fill="#F59E0B" stroke="#F8FAFC" stroke-width="2"/>
+    <text x="135" y="120" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="end">(-1, 2) MAX</text>
+
+    <circle cx="340" cy="380" r="7" fill="#38BDF8" stroke="#F8FAFC" stroke-width="2"/>
+    <text x="345" y="410" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700"> (1, -2) MIN</text>
+  </g>
+
+  <!-- Right Side: The Sign Chart and Algebraic Stages -->
+  <g transform="translate(540, 30)">
+    <rect width="380" height="480" rx="10" fill="#111827" stroke="#334155" stroke-width="1"/>
+    <text x="190" y="35" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="700" text-anchor="middle">Algebraic Derivation</text>
+
+    <!-- Step 1: Derivative -->
+    <g transform="translate(20, 60)">
+      <text x="0" y="20" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="14">Step 1: Differentiate &amp; Factor</text>
+      <rect x="0" y="30" width="340" height="45" rx="6" fill="#1E293B"/>
+      <text x="15" y="58" fill="#F8FAFC" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="600">f'(x) = 3x² - 3 = 3(x - 1)(x + 1)</text>
+    </g>
+
+    <!-- Step 2: Critical Numbers -->
+    <g transform="translate(20, 155)">
+      <text x="0" y="20" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="14">Step 2: Solve f'(x) = 0</text>
+      <rect x="0" y="30" width="340" height="45" rx="6" fill="#1E293B"/>
+      <text x="15" y="58" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="700">x = -1  and  x = +1</text>
+    </g>
+
+    <!-- Step 3: Sign Chart Table -->
+    <g transform="translate(20, 250)">
+      <text x="0" y="20" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="14">Step 3: Interval Sign Analysis</text>
+      <rect x="0" y="30" width="340" height="110" rx="6" fill="#1E293B" stroke="#475569" stroke-width="1"/>
+
+      <!-- Headers -->
+      <line x1="0" y1="65" x2="340" y2="65" stroke="#475569" stroke-width="1"/>
+      <line x1="110" y1="30" x2="110" y2="140" stroke="#475569" stroke-width="1"/>
+      <line x1="225" y1="30" x2="225" y2="140" stroke="#475569" stroke-width="1"/>
+
+      <text x="55" y="52" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">(-∞, -1)</text>
+      <text x="167" y="52" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">(-1, 1)</text>
+      <text x="282" y="52" fill="#94A3B8" font-family="-apple-system, system-ui, sans-serif" font-size="12" text-anchor="middle">(1, ∞)</text>
+
+      <!-- Row 1: Test point -->
+      <text x="55" y="85" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">x = -2: (+)</text>
+      <text x="167" y="85" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">x = 0: (-)</text>
+      <text x="282" y="85" fill="#CBD5E1" font-family="-apple-system, system-ui, sans-serif" font-size="13" text-anchor="middle">x = 2: (+)</text>
+
+      <!-- Row 2: Behavior -->
+      <text x="55" y="120" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Increasing ↗</text>
+      <text x="167" y="120" fill="#F43F5E" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Decreasing ↘</text>
+      <text x="282" y="120" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">Increasing ↗</text>
+    </g>
+
+    <!-- Step 4: Coordinates -->
+    <g transform="translate(20, 395)">
+      <rect x="0" y="15" width="340" height="55" rx="6" fill="#0F172A" stroke="#38BDF8" stroke-width="1.5"/>
+      <text x="170" y="38" fill="#F59E0B" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">LOCAL MAX: (-1, 2)  [Sign: + to -]</text>
+      <text x="170" y="58" fill="#38BDF8" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="700" text-anchor="middle">LOCAL MIN: (1, -2)  [Sign: - to +]</text>
+    </g>
+  </g>
+</svg>
