@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Maxima & Minima — Motion-Based Engineering Lecture</title>
+  <title>Maxima & Minima — Motion-Based Engineering Calculus (ManimCE)</title>
   <style>
     :root {
       --bg: #0B0F19;
@@ -27,14 +27,14 @@
       flex-direction: column;
     }
     header {
-      height: 54px;
-      background: rgba(19, 27, 46, 0.85);
+      height: 56px;
+      background: rgba(19, 27, 46, 0.95);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--card-border);
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
+      padding: 0 20px;
       z-index: 100;
     }
     .brand {
@@ -43,7 +43,6 @@
       gap: 12px;
       font-size: 14px;
       font-weight: 600;
-      letter-spacing: 0.5px;
     }
     .badge {
       background: rgba(56, 189, 248, 0.15);
@@ -55,16 +54,21 @@
       font-weight: 700;
       text-transform: uppercase;
     }
+    .badge-amber {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--amber);
+      border: 1px solid rgba(245, 158, 11, 0.4);
+    }
     .controls {
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
     }
-    button {
+    button, select {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       color: var(--text);
-      padding: 6px 14px;
+      padding: 6px 12px;
       border-radius: 6px;
       font-size: 13px;
       cursor: pointer;
@@ -74,9 +78,10 @@
       transition: all 0.2s ease;
       touch-action: manipulation;
     }
-    button:hover { background: #1E293B; border-color: var(--cyan); color: var(--cyan); }
+    button:hover, select:hover { background: #1E293B; border-color: var(--cyan); color: var(--cyan); }
     button.active { background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: var(--cyan); }
     button.danger:hover { border-color: var(--coral); color: var(--coral); }
+    select { outline: none; }
     
     .main-stage {
       flex: 1;
@@ -84,7 +89,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      padding: 20px;
+      padding: 16px;
     }
     .slide-container {
       width: 100%;
@@ -105,27 +110,27 @@
       display: none;
       width: 100%;
       height: 100%;
-      padding: 28px 36px;
+      padding: 24px 32px;
       flex-direction: column;
     }
     .slide.active { display: flex; }
     
     .slide-top {
-      margin-bottom: 16px;
+      margin-bottom: 14px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
       border-bottom: 1px solid rgba(51, 65, 85, 0.5);
-      padding-bottom: 12px;
+      padding-bottom: 10px;
     }
     .slide-top .meta { font-size: 11px; font-weight: 700; color: var(--cyan); text-transform: uppercase; letter-spacing: 1px; }
-    .slide-top h1 { font-size: 24px; font-weight: 700; color: #fff; margin-top: 4px; }
+    .slide-top h1 { font-size: 22px; font-weight: 700; color: #fff; margin-top: 2px; }
     .slide-top .slide-num { font-size: 13px; color: var(--muted); font-weight: 600; }
 
     .slide-body {
       flex: 1;
       display: grid;
-      gap: 20px;
+      gap: 16px;
       overflow: hidden;
     }
     .grid-video { grid-template-columns: 2fr 1fr; }
@@ -137,7 +142,7 @@
       background: var(--card-bg);
       border: 1px solid var(--card-border);
       border-radius: 10px;
-      padding: 20px;
+      padding: 18px;
       display: flex;
       flex-direction: column;
       overflow-y: auto;
@@ -153,12 +158,23 @@
       border-radius: 8px;
       overflow: hidden;
       background: #000;
-      border: 1px solid rgba(56, 189, 248, 0.3);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      display: flex;
+      flex-direction: column;
+    }
+    video { width: 100%; height: calc(100% - 38px); object-fit: contain; background: #0B0F19; }
+    .video-toolbar {
+      height: 38px;
+      background: rgba(15, 23, 42, 0.95);
+      border-top: 1px solid var(--card-border);
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: space-between;
+      padding: 0 12px;
+      font-size: 11px;
     }
-    video { width: 100%; height: 100%; object-fit: contain; }
+    .video-toolbar button { padding: 3px 8px; font-size: 11px; }
+
     img.frame-ref { width: 100%; height: 100%; object-fit: contain; border-radius: 8px; }
 
     /* Canvas Drawing Overlay */
@@ -194,12 +210,6 @@
     }
     .teleprompter h4 { color: var(--amber); margin-bottom: 8px; font-size: 12px; text-transform: uppercase; }
 
-    /* Color Palette for Apple Pencil */
-    .pencil-bar {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
     .color-dot {
       width: 18px;
       height: 18px;
@@ -210,7 +220,6 @@
     }
     .color-dot.active { transform: scale(1.2); border-color: #fff; }
 
-    /* Footer Nav */
     footer {
       height: 48px;
       background: var(--card-bg);
@@ -218,7 +227,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 24px;
+      padding: 0 20px;
       font-size: 13px;
     }
     .progress-bar {
@@ -236,19 +245,49 @@
 
   <header>
     <div class="brand">
-      <span class="badge">iPad / Pro Edition</span>
+      <span class="badge">ManimCE 3Blue1Brown Engine</span>
       <span>Calculus: Maxima & Minima</span>
     </div>
 
     <div class="controls">
-      <div class="pencil-bar">
-        <button id="drawBtn" title="Toggle Apple Pencil Drawing">✍️ Draw</button>
+      <!-- Quick Scene Navigator -->
+      <select id="sceneNav" title="Jump directly to any scene">
+        <option value="0">01. Title & Intro</option>
+        <option value="1">02. 4-Phase Roadmap</option>
+        <option value="2">03. 🎬 Scene 1: Terrain Hook (Video)</option>
+        <option value="3">04. ✍️ Scene 1: Terrain Slope Scratchpad</option>
+        <option value="4">05. 🎬 Scene 2: Local vs Absolute (Video)</option>
+        <option value="5">06. ✍️ Scene 2: Neighborhood Test Scratchpad</option>
+        <option value="6">07. 🎬 Scene 7: Cubic Curve f(x)=x³-3x (Video)</option>
+        <option value="7">08. 🎬 Scene 8: Dynamic Tangent Telemetry (Video)</option>
+        <option value="8">09. ✍️ Scene 8: Tangent Power Rule Scratchpad</option>
+        <option value="9">10. 🎬 Scene 10: Singularities Corners/Cusps (Video)</option>
+        <option value="10">11. ✍️ Scene 10: Difference Quotient DNE Scratchpad</option>
+        <option value="11">12. 🎬 Scene 12: Critical Trap g(x)=x³ Terrace (Video)</option>
+        <option value="12">13. ✍️ Scene 12: Necessary vs Sufficient Scratchpad</option>
+        <option value="13" selected>14. 🎬 Scene 14: Equation Morphing (Video)</option>
+        <option value="14">15. 🎬 Scene 15: First Derivative Sign Chart (Video)</option>
+        <option value="15">16. ✍️ Scene 16: Sign Chart Table Scratchpad</option>
+        <option value="16">17. 🎬 Scene 17: Extrema Coordinates Reveal (Video)</option>
+        <option value="17">18. 🎬 Scene 18: Second Derivative Concavity (Video)</option>
+        <option value="18">19. 19. 1st vs 2nd Test Comparison Matrix</option>
+        <option value="19">20. 🎬 Scene 20: Closed Interval EVT (Video)</option>
+        <option value="20">21. 🎬 Scene 21: Max Power Transfer Circuit (Video)</option>
+        <option value="21">22. 22. Active Challenge & Exit Ticket</option>
+      </select>
+
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <button id="drawBtn" title="Toggle Apple Pencil Inking">✍️ Draw</button>
         <div class="color-dot active" style="background: #38BDF8;" data-color="#38BDF8" title="Cyan"></div>
         <div class="color-dot" style="background: #F59E0B;" data-color="#F59E0B" title="Amber"></div>
         <div class="color-dot" style="background: #F43F5E;" data-color="#F43F5E" title="Coral"></div>
         <div class="color-dot" style="background: #FFFFFF;" data-color="#FFFFFF" title="White"></div>
         <button id="clearInkBtn" class="danger" title="Clear Ink">Clear</button>
       </div>
+
+      <a href="maxima_minima_lecture.pptx" download style="text-decoration:none;">
+        <button style="background: rgba(34, 197, 94, 0.2); border-color: var(--green); color: var(--green);" title="Download Keynote/PowerPoint Deck">📥 Keynote (.pptx)</button>
+      </a>
 
       <button id="notesBtn" title="Toggle Lecturer Teleprompter">📋 Notes</button>
       <button id="fsBtn" title="Fullscreen Presentation">⛶ Fullscreen</button>
@@ -262,21 +301,27 @@
       <!-- SLIDE 1: Title -->
       <div class="slide active" data-title="Title Slide">
         <div class="slide-top">
-          <div class="meta">Engineering Differential Calculus</div>
+          <div class="meta">Engineering Differential Calculus // Motion Series</div>
           <div class="slide-num">Slide 01 / 22</div>
         </div>
         <div class="slide-body grid-full">
-          <div class="card cyan-border" style="justify-content: center; align-items: center; text-align: center; padding: 40px;">
-            <div style="font-size: 14px; font-weight: 700; color: var(--cyan); letter-spacing: 2px; margin-bottom: 12px;">CALCULUS IN MOTION</div>
+          <div class="card cyan-border" style="justify-content: center; align-items: center; text-align: center; padding: 36px;">
+            <div style="font-size: 13px; font-weight: 700; color: var(--cyan); letter-spacing: 2px; margin-bottom: 12px;">CALCULUS IN MOTION</div>
             <h1 style="font-size: 38px; color: #fff; line-height: 1.2; margin-bottom: 16px;">Maxima & Minima</h1>
             <h3 style="font-size: 20px; color: var(--amber); margin-bottom: 24px; font-weight: 500;">Dynamic Motion, Extrema Tests & Engineering Optimization</h3>
-            <p style="max-width: 700px; color: var(--muted); font-size: 15px; line-height: 1.6;">
-              A mathematical motion lecture inspired by 3Blue1Brown, featuring genuine ManimCE transformations,
+            <p style="max-width: 720px; color: var(--muted); font-size: 14.5px; line-height: 1.6;">
+              A mathematical motion lecture inspired by 3Blue1Brown, featuring genuine Manim Community Edition vector animations,
               continuous tangent slope telemetry, concavity bending, and real-time Apple Pencil derivation workspaces.
             </p>
-            <div style="margin-top: 36px; display: flex; gap: 16px;">
-              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--amber); border-color: rgba(245, 158, 11, 0.4);">Core: f(x) = x³ - 3x</span>
-              <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: var(--green); border-color: rgba(34, 197, 94, 0.4);">App: Max Power Transfer</span>
+            <div style="margin-top: 32px; display: flex; gap: 14px; flex-wrap: wrap; justify-content: center;">
+              <span class="badge" style="background: rgba(245, 158, 11, 0.15); color: var(--amber); border-color: rgba(245, 158, 11, 0.4);">Core Model: f(x) = x³ - 3x</span>
+              <span class="badge" style="background: rgba(56, 189, 248, 0.15); color: var(--cyan); border-color: rgba(56, 189, 248, 0.4);">Factoring Morphing via TransformMatchingTex</span>
+              <span class="badge" style="background: rgba(34, 197, 94, 0.15); color: var(--green); border-color: rgba(34, 197, 94, 0.4);">Circuit: Maximum Power Transfer</span>
+            </div>
+            <div style="margin-top: 24px;">
+              <button onclick="showSlide(13)" style="background: rgba(56, 189, 248, 0.2); border-color: var(--cyan); color: var(--cyan); font-weight: 700; padding: 10px 20px; font-size: 14px;">
+                ⚡ Jump Straight to Equation Morphing Animation (Slide 14) ➔
+              </button>
             </div>
           </div>
         </div>
@@ -285,27 +330,27 @@
       <!-- SLIDE 2: Roadmap -->
       <div class="slide" data-title="Lecture Trajectory">
         <div class="slide-top">
-          <div><div class="meta">Pedagogical Arc</div><h1>Lecture Trajectory</h1></div>
+          <div><div class="meta">Pedagogical Arc</div><h1>Lecture Trajectory: From Intuition to Proof</h1></div>
           <div class="slide-num">Slide 02 / 22</div>
         </div>
         <div class="slide-body grid-equal">
           <div class="card cyan-border">
-            <h2 style="color: var(--cyan); font-size: 18px; margin-bottom: 10px;">01. Visual Motion & Critical Points</h2>
-            <p style="color: var(--muted); font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
-              Terrain exploration hook, moving tangent vectors, instantaneous velocity zeros, and singularities (corners & cusps).
+            <h2 style="color: var(--cyan); font-size: 17px; margin-bottom: 8px;">01. Visual Motion & Critical Points</h2>
+            <p style="color: var(--muted); font-size: 13.5px; line-height: 1.5; margin-bottom: 14px;">
+              Terrain exploration hook, moving tangent vectors, instantaneous slope freezing m = 0, and singularities (corners & cusps).
             </p>
-            <h2 style="color: var(--amber); font-size: 18px; margin-bottom: 10px;">02. First Derivative Test & Sign Charts</h2>
-            <p style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+            <h2 style="color: var(--amber); font-size: 17px; margin-bottom: 8px;">02. First Derivative Test & Sign Charts</h2>
+            <p style="color: var(--muted); font-size: 13.5px; line-height: 1.5;">
               Factoring transformations, number line interval sampling, and direction transitions across critical thresholds.
             </p>
           </div>
           <div class="card coral-border">
-            <h2 style="color: var(--coral); font-size: 18px; margin-bottom: 10px;">03. Second Derivative & Concavity</h2>
-            <p style="color: var(--muted); font-size: 14px; line-height: 1.5; margin-bottom: 16px;">
+            <h2 style="color: var(--coral); font-size: 17px; margin-bottom: 8px;">03. Second Derivative & Concavity</h2>
+            <p style="color: var(--muted); font-size: 13.5px; line-height: 1.5; margin-bottom: 14px;">
               Curvature rate f''(x), concavity bowls (cap vs. cup), and the stationary inflection terrace counterexample g(x) = x³.
             </p>
-            <h2 style="color: var(--green); font-size: 18px; margin-bottom: 10px;">04. Closed-Interval Optimization</h2>
-            <p style="color: var(--muted); font-size: 14px; line-height: 1.5;">
+            <h2 style="color: var(--green); font-size: 17px; margin-bottom: 8px;">04. Closed-Interval Optimization</h2>
+            <p style="color: var(--muted); font-size: 13.5px; line-height: 1.5;">
               Extreme Value Theorem on [a, b], candidate matrix evaluation, and circuit Maximum Power Transfer Theorem.
             </p>
           </div>
@@ -315,19 +360,23 @@
       <!-- SLIDE 3: Hook Hill Video -->
       <div class="slide" data-title="Terrain Exploration Hook" data-notes="Play video clip. Ask students: As the exploration probe traverses this mountain range, what exact instantaneous property characterizes the true summits and lowest valleys?">
         <div class="slide-top">
-          <div><div class="meta">Opening Hook // Manim Motion</div><h1>Terrain Exploration: Peaks & Valleys</h1></div>
+          <div><div class="meta">Opening Hook // Manim Motion Animation</div><h1>Terrain Exploration: Peaks & Valleys</h1></div>
           <div class="slide-num">Slide 03 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/Scene01_HookHill_frame.png">
-              <source src="../media/videos/clips/Scene01_HookHill.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene01_HookHill_frame.png">
+              <source src="media/videos/clips/Scene01_HookHill.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">PEDAGOGICAL HOOK</h3>
-            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 14px;">Where do true summits occur?</p>
-            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 16px;">
+            <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Where do true summits occur?</p>
+            <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
               Notice the moving elevation probe. On the ascent, slope is positive. On the descent, slope is negative.
               At the exact apex, vertical motion freezes.
             </p>
@@ -342,19 +391,19 @@
       <!-- SLIDE 4: Hook Hill Annotation -->
       <div class="slide" data-title="Terrain Annotation Workspace" data-notes="Take Apple Pencil. Draw tangents at crests and troughs live. Write m = tan(theta) = 0.">
         <div class="slide-top">
-          <div><div class="meta">Live Annotation // Apple Pencil</div><h1>Tangent Equilibrium & Slope Incline</h1></div>
+          <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Tangent Equilibrium & Slope Incline</h1></div>
           <div class="slide-num">Slide 04 / 22</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
-            <img class="frame-ref" src="../media/frames/Scene01_HookHill_frame.png" alt="Terrain Frame">
+            <img class="frame-ref" src="media/frames/Scene01_HookHill_frame.png" alt="Terrain Frame">
           </div>
           <div class="card cyan-border" style="background: #0F172A;">
             <h3 style="color: var(--cyan); font-size: 13px; margin-bottom: 8px;">APPLE PENCIL SCRATCHPAD</h3>
             <p style="color: #fff; font-weight: 600; font-size: 14px; margin-bottom: 12px;">Live Student Derivation Prompts:</p>
             <ul style="color: var(--muted); font-size: 13px; line-height: 1.6; padding-left: 18px;">
               <li>✍️ Draw tangent vectors at x = -2.5 (ascent), x = -1.2 (crest), and x = 0 (descent).</li>
-              <li>✍️ Write the instantaneous slope inequality: f'(x) > 0 vs. f'(x) = 0 vs. f'(x) < 0.</li>
+              <li>✍️ Write the instantaneous slope inequality: f'(x) &gt; 0 vs. f'(x) = 0 vs. f'(x) &lt; 0.</li>
               <li>✍️ Circle the Local Maximum vs. the Global Mountain Peak.</li>
             </ul>
           </div>
@@ -364,14 +413,18 @@
       <!-- SLIDE 5: Local vs Absolute Video -->
       <div class="slide" data-title="Local vs Absolute Extrema" data-notes="Clarify open ball definition: Local requires an open neighborhood. Absolute is domain-wide.">
         <div class="slide-top">
-          <div><div class="meta">Conceptual Foundations // Manim Motion</div><h1>Local Extrema vs. Absolute Boundaries</h1></div>
+          <div><div class="meta">Conceptual Foundations // Manim Motion Animation</div><h1>Local Extrema vs. Absolute Boundaries</h1></div>
           <div class="slide-num">Slide 05 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/Scene02_LocalVsAbsolute_frame.png">
-              <source src="../media/videos/clips/Scene02_LocalVsAbsolute.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene02_LocalVsAbsolute_frame.png">
+              <source src="media/videos/clips/Scene02_LocalVsAbsolute.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">TOPOLOGICAL DISTINCTION</h3>
@@ -389,14 +442,14 @@
       </div>
 
       <!-- SLIDE 6: Local vs Absolute Annotation -->
-      <div class="slide" data-title="Neighborhood Test Annotation" data-notes="Draw the open neighborhood interval around the interior peak. Show why the boundary endpoint cannot contain a two-sided ball.">
+      <div class="slide" data-title="Neighborhood Test Annotation">
         <div class="slide-top">
-          <div><div class="meta">Live Annotation // Apple Pencil</div><h1>The Neighborhood Test & Boundary Caps</h1></div>
+          <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>The Neighborhood Test & Boundary Caps</h1></div>
           <div class="slide-num">Slide 06 / 22</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
-            <img class="frame-ref" src="../media/frames/Scene02_LocalVsAbsolute_frame.png" alt="Extrema Frame">
+            <img class="frame-ref" src="media/frames/Scene02_LocalVsAbsolute_frame.png" alt="Extrema Frame">
           </div>
           <div class="card amber-border" style="background: #0F172A;">
             <h3 style="color: var(--amber); font-size: 13px; margin-bottom: 8px;">APPLE PENCIL SCRATCHPAD</h3>
@@ -411,16 +464,20 @@
       </div>
 
       <!-- SLIDE 7: Signature Scene 1 Video -->
-      <div class="slide" data-title="Cubic Trajectory f(x)=x^3-3x" data-notes="Introduce f(x) = x^3 - 3x. Highlight odd symmetry f(-x) = -f(x).">
+      <div class="slide" data-title="Cubic Trajectory f(x)=x^3-3x">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion</div><h1>The Cubic Function: f(x) = x³ - 3x</h1></div>
+          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>The Cubic Function: f(x) = x³ - 3x</h1></div>
           <div class="slide-num">Slide 07 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene1_TheFunction_frame.png">
-              <source src="../media/videos/clips/SignatureScene1_TheFunction.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene1_TheFunction_frame.png">
+              <source src="media/videos/clips/SignatureScene1_TheFunction.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">MATHEMATICAL MODEL</h3>
@@ -437,25 +494,29 @@
       </div>
 
       <!-- SLIDE 8: Signature Scene 2 Video -->
-      <div class="slide" data-title="Dynamic Tangent Telemetry" data-notes="Point out real-time slope telemetry card. Watch slope freeze to m = 0.00 at x = -1.00 and x = 1.00.">
+      <div class="slide" data-title="Dynamic Tangent Telemetry">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion</div><h1>Dynamic Tangent Line & Slope Telemetry</h1></div>
+          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>Dynamic Tangent Line & Slope Telemetry</h1></div>
           <div class="slide-num">Slide 08 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene2_TheTangent_frame.png">
-              <source src="../media/videos/clips/SignatureScene2_TheTangent.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene2_TheTangent_frame.png">
+              <source src="media/videos/clips/SignatureScene2_TheTangent.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">DERIVATIVE VELOCITY</h3>
             <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Real-Time Slope Readout</p>
             <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
               As the point glides along the curve, the tangent vector rotates dynamically:
-              <br>• <strong>Cyan:</strong> m > 0 (climbing)
+              <br>• <strong>Cyan:</strong> m &gt; 0 (climbing)
               <br>• <strong>Amber:</strong> m = 0 (horizontal freeze)
-              <br>• <strong>Coral:</strong> m < 0 (descending)
+              <br>• <strong>Coral:</strong> m &lt; 0 (descending)
             </p>
             <div style="background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
               <div style="color: var(--amber); font-weight: 700; font-size: 11px;">TURNING POINT CONDITION</div>
@@ -466,14 +527,14 @@
       </div>
 
       <!-- SLIDE 9: Signature Scene 2 Annotation -->
-      <div class="slide" data-title="Slope Derivation Annotation" data-notes="Derive f'(x) = 3x^2 - 3 step-by-step. Calculate slope at x=0 (steepest descent).">
+      <div class="slide" data-title="Slope Derivation Annotation">
         <div class="slide-top">
-          <div><div class="meta">Live Annotation // Apple Pencil</div><h1>Derivative Derivation & Instantaneous Velocity</h1></div>
+          <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Derivative Derivation & Instantaneous Velocity</h1></div>
           <div class="slide-num">Slide 09 / 22</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
-            <img class="frame-ref" src="../media/frames/SignatureScene2_TheTangent_frame.png" alt="Tangent Frame">
+            <img class="frame-ref" src="media/frames/SignatureScene2_TheTangent_frame.png" alt="Tangent Frame">
           </div>
           <div class="card cyan-border" style="background: #0F172A;">
             <h3 style="color: var(--cyan); font-size: 13px; margin-bottom: 8px;">APPLE PENCIL SCRATCHPAD</h3>
@@ -481,23 +542,27 @@
             <ul style="color: var(--muted); font-size: 13px; line-height: 1.6; padding-left: 18px;">
               <li>✍️ Compute f'(x) = d/dx [x³ - 3x] = 3x² - 3.</li>
               <li>✍️ Evaluate f'(0) = -3: Why is descent steepest at the y-intercept?</li>
-              <li>✍️ Set f'(x) = 0: Solve 3x² - 3 = 0  =>  x² = 1  =>  x = ±1.</li>
+              <li>✍️ Set f'(x) = 0: Solve 3x² - 3 = 0  =&gt;  x² = 1  =&gt;  x = ±1.</li>
             </ul>
           </div>
         </div>
       </div>
 
       <!-- SLIDE 10: Singularities DNE Video -->
-      <div class="slide" data-title="Singularities DNE" data-notes="Corners and cusps: derivative does not exist, yet valid global minima exist. Critical points must include DNE!">
+      <div class="slide" data-title="Singularities DNE">
         <div class="slide-top">
-          <div><div class="meta">Singularities // Manim Motion</div><h1>When Derivatives Fail: Corners & Cusps</h1></div>
+          <div><div class="meta">Singularities // Manim Motion Animation</div><h1>When Derivatives Fail: Corners & Cusps</h1></div>
           <div class="slide-num">Slide 10 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/Scene03_SingularitiesDNE_frame.png">
-              <source src="../media/videos/clips/Scene03_SingularitiesDNE.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene03_SingularitiesDNE_frame.png">
+              <source src="media/videos/clips/Scene03_SingularitiesDNE.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card coral-border">
             <h3 style="color: var(--coral); margin-bottom: 8px;">NON-DIFFERENTIABLE EXTREMA</h3>
@@ -514,14 +579,14 @@
       </div>
 
       <!-- SLIDE 11: Singularities Annotation -->
-      <div class="slide" data-title="Singularity Limits Annotation" data-notes="Write out left and right limits of the difference quotient. Prove DNE.">
+      <div class="slide" data-title="Singularity Limits Annotation">
         <div class="slide-top">
-          <div><div class="meta">Live Annotation // Apple Pencil</div><h1>Difference Quotient Singularity Proof</h1></div>
+          <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Difference Quotient Singularity Proof</h1></div>
           <div class="slide-num">Slide 11 / 22</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
-            <img class="frame-ref" src="../media/frames/Scene03_SingularitiesDNE_frame.png" alt="Singularities Frame">
+            <img class="frame-ref" src="media/frames/Scene03_SingularitiesDNE_frame.png" alt="Singularities Frame">
           </div>
           <div class="card amber-border" style="background: #0F172A;">
             <h3 style="color: var(--amber); font-size: 13px; margin-bottom: 8px;">APPLE PENCIL SCRATCHPAD</h3>
@@ -536,16 +601,20 @@
       </div>
 
       <!-- SLIDE 12: Signature Scene 7 Video Counterexample -->
-      <div class="slide" data-title="Counterexample g(x)=x^3" data-notes="Counterexample: g'(0) = 0 but (0,0) is neither a max nor a min. Necessary vs sufficient condition.">
+      <div class="slide" data-title="Counterexample g(x)=x^3">
         <div class="slide-top">
-          <div><div class="meta">Counterexample // Manim Motion</div><h1>The Critical Trap: g(x) = x³ Inflection Terrace</h1></div>
+          <div><div class="meta">Counterexample // Manim Motion Animation</div><h1>The Critical Trap: g(x) = x³ Inflection Terrace</h1></div>
           <div class="slide-num">Slide 12 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene7_Counterexample_frame.png">
-              <source src="../media/videos/clips/SignatureScene7_Counterexample.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene7_Counterexample_frame.png">
+              <source src="media/videos/clips/SignatureScene7_Counterexample.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">THE CRITICAL POINT TRAP</h3>
@@ -563,14 +632,14 @@
       </div>
 
       <!-- SLIDE 13: Counterexample Annotation -->
-      <div class="slide" data-title="Logic of Fermat Theorem" data-notes="Draw the Venn diagram or logical implication arrows: Extrema => f'=0, but f'=0 does NOT imply extrema.">
+      <div class="slide" data-title="Logic of Fermat Theorem">
         <div class="slide-top">
-          <div><div class="meta">Live Annotation // Apple Pencil</div><h1>Logical Implication: Necessary vs. Sufficient</h1></div>
+          <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Logical Implication: Necessary vs. Sufficient</h1></div>
           <div class="slide-num">Slide 13 / 22</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
-            <img class="frame-ref" src="../media/frames/SignatureScene7_Counterexample_frame.png" alt="Counterexample Frame">
+            <img class="frame-ref" src="media/frames/SignatureScene7_Counterexample_frame.png" alt="Counterexample Frame">
           </div>
           <div class="card cyan-border" style="background: #0F172A;">
             <h3 style="color: var(--cyan); font-size: 13px; margin-bottom: 8px;">APPLE PENCIL SCRATCHPAD</h3>
@@ -578,29 +647,38 @@
             <ul style="color: var(--muted); font-size: 13px; line-height: 1.6; padding-left: 18px;">
               <li>✍️ Write Fermat's Theorem: Local Extremum at c (diff'able) ⟹ f'(c) = 0.</li>
               <li>✍️ Strike through the false converse: f'(c) = 0 ⇏ Local Extremum.</li>
-              <li>✍️ Analyze g'(x) = 3x²: For x < 0, 3x² > 0. For x > 0, 3x² > 0. No sign change!</li>
+              <li>✍️ Analyze g'(x) = 3x²: For x &lt; 0, 3x² &gt; 0. For x &gt; 0, 3x² &gt; 0. No sign change!</li>
             </ul>
           </div>
         </div>
       </div>
 
       <!-- SLIDE 14: Signature Scene 3 Video Morphing -->
-      <div class="slide" data-title="Equation Morphing" data-notes="Observe the mathematical transformation: 3x^2 - 3 -> 3(x-1)(x+1) -> x = -1, +1. Drop lines project to the curve.">
+      <div class="slide" data-title="Equation Morphing">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion</div><h1>Algebraic Morphing: Factoring the Derivative</h1></div>
+          <div><div class="meta">Signature Sequence // Manim TransformMatchingTex Morphing</div><h1>Algebraic Morphing: Factoring the Derivative</h1></div>
           <div class="slide-num">Slide 14 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene3_EquationMorph_frame.png">
-              <source src="../media/videos/clips/SignatureScene3_EquationMorph.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene3_EquationMorph_frame.png">
+              <source src="media/videos/clips/SignatureScene3_EquationMorph.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge" style="background: rgba(245, 158, 11, 0.2); color: var(--amber); border-color: var(--amber);">🎬 3Blue1Brown Equation Morphing</span>
+              <button onclick="replayVideo(this)" style="background: var(--amber); color: #000; font-weight: 700;">🔁 Replay Morphing</button>
+            </div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">CONTINUOUS MORPH</h3>
             <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">TransformMatchingTex In Action</p>
             <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
-              Watch LaTeX equations reshape naturally from polynomial difference into linear factors, then drop coordinate dashed lines directly onto the curve's x-axis.
+              Watch LaTeX equations reshape continuously from polynomial difference into linear factors, then drop coordinate dashed lines directly onto the curve's x-axis:
+              <br><br>
+              <strong>1.</strong> f'(x) = 3x² - 3<br>
+              <strong>2.</strong> ➔ 3(x² - 1)<br>
+              <strong>3.</strong> ➔ 3(x - 1)(x + 1) = 0<br>
+              <strong>4.</strong> ➔ Critical roots at x = -1 and x = +1
             </p>
             <div style="background: rgba(56, 189, 248, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(56, 189, 248, 0.3);">
               <div style="color: var(--cyan); font-weight: 700; font-size: 11px;">CRITICAL NUMBERS</div>
@@ -611,24 +689,28 @@
       </div>
 
       <!-- SLIDE 15: Signature Scene 4 Video Sign Chart -->
-      <div class="slide" data-title="First Derivative Test Sign Chart" data-notes="Interval sign partitioning: test points x = -2 (+), x = 0 (-), x = +2 (+).">
+      <div class="slide" data-title="First Derivative Test Sign Chart">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion</div><h1>First Derivative Test: Dynamic Sign Chart</h1></div>
+          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>First Derivative Test: Dynamic Sign Chart</h1></div>
           <div class="slide-num">Slide 15 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene4_DerivativeTest_frame.png">
-              <source src="../media/videos/clips/SignatureScene4_DerivativeTest.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene4_DerivativeTest_frame.png">
+              <source src="media/videos/clips/SignatureScene4_DerivativeTest.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">INTERVAL DYNAMICS</h3>
             <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">Sign Alternation & Trapped Extrema</p>
             <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
-              • <strong>(-∞, -1):</strong> f'(x) > 0  ↗ Curve climbs<br>
-              • <strong>(-1, 1):</strong> f'(x) < 0  ↘ Curve descends<br>
-              • <strong>(1, ∞):</strong> f'(x) > 0  ↗ Curve climbs
+              • <strong>(-∞, -1):</strong> f'(x) &gt; 0  ↗ Curve climbs<br>
+              • <strong>(-1, 1):</strong> f'(x) &lt; 0  ↘ Curve descends<br>
+              • <strong>(1, ∞):</strong> f'(x) &gt; 0  ↗ Curve climbs
             </p>
             <div style="background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
               <div style="color: var(--amber); font-weight: 700; font-size: 11px;">CONCLUSION</div>
@@ -639,39 +721,43 @@
       </div>
 
       <!-- SLIDE 16: Signature Scene 4 Annotation -->
-      <div class="slide" data-title="Sign Chart Construction" data-notes="Fill out the 3-row sign chart table with Apple Pencil. Test values: -2, 0, +2.">
+      <div class="slide" data-title="Sign Chart Construction">
         <div class="slide-top">
-          <div><div class="meta">Live Annotation // Apple Pencil</div><h1>Constructing the Derivative Sign Table</h1></div>
+          <div><div class="meta">Live Annotation // Apple Pencil Scratchpad</div><h1>Constructing the Derivative Sign Table</h1></div>
           <div class="slide-num">Slide 16 / 22</div>
         </div>
         <div class="slide-body grid-annotate">
           <div class="card" style="padding: 10px; align-items: center; justify-content: center;">
-            <img class="frame-ref" src="../media/frames/SignatureScene4_DerivativeTest_frame.png" alt="Sign Chart Frame">
+            <img class="frame-ref" src="media/frames/SignatureScene4_DerivativeTest_frame.png" alt="Sign Chart Frame">
           </div>
           <div class="card cyan-border" style="background: #0F172A;">
             <h3 style="color: var(--cyan); font-size: 13px; margin-bottom: 8px;">APPLE PENCIL SCRATCHPAD</h3>
             <p style="color: #fff; font-weight: 600; font-size: 14px; margin-bottom: 12px;">Factored Test Matrix 3(x-1)(x+1):</p>
             <ul style="color: var(--muted); font-size: 13px; line-height: 1.6; padding-left: 18px;">
-              <li>✍️ Draw columns: x < -1 | x = -1 | -1 < x < 1 | x = 1 | x > 1.</li>
-              <li>✍️ Test x = -2: 3(-3)(-1) = +9 > 0 (↗).</li>
-              <li>✍️ Test x = 0: 3(-1)(+1) = -3 < 0 (↘).</li>
-              <li>✍️ Test x = +2: 3(+1)(+3) = +9 > 0 (↗).</li>
+              <li>✍️ Draw columns: x &lt; -1 | x = -1 | -1 &lt; x &lt; 1 | x = 1 | x &gt; 1.</li>
+              <li>✍️ Test x = -2: 3(-3)(-1) = +9 &gt; 0 (↗).</li>
+              <li>✍️ Test x = 0: 3(-1)(+1) = -3 &lt; 0 (↘).</li>
+              <li>✍️ Test x = +2: 3(+1)(+3) = +9 &gt; 0 (↗).</li>
             </ul>
           </div>
         </div>
       </div>
 
       <!-- SLIDE 17: Signature Scene 5 Video Extrema Reveal -->
-      <div class="slide" data-title="Extrema Coordinates Reveal" data-notes="Warn students: never substitute back into f'(x) to get coordinates! Always evaluate in original f(x).">
+      <div class="slide" data-title="Extrema Coordinates Reveal">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion</div><h1>Exact Extrema Coordinates: (-1, 2) & (1, -2)</h1></div>
+          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>Exact Extrema Coordinates: (-1, 2) & (1, -2)</h1></div>
           <div class="slide-num">Slide 17 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene5_ExtremaReveal_frame.png">
-              <source src="../media/videos/clips/SignatureScene5_ExtremaReveal.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene5_ExtremaReveal_frame.png">
+              <source src="media/videos/clips/SignatureScene5_ExtremaReveal.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">COORDINATE VERIFICATION</h3>
@@ -691,24 +777,28 @@
       </div>
 
       <!-- SLIDE 18: Signature Scene 6 Video Second Derivative -->
-      <div class="slide" data-title="Second Derivative & Concavity" data-notes="Second derivative f''(x) = 6x. Concave Down traps a max; Concave Up holds a min.">
+      <div class="slide" data-title="Second Derivative & Concavity">
         <div class="slide-top">
-          <div><div class="meta">Signature Sequence // Manim Motion</div><h1>Second Derivative Test & Concavity Bending</h1></div>
+          <div><div class="meta">Signature Sequence // Manim Motion Animation</div><h1>Second Derivative Test & Concavity Bending</h1></div>
           <div class="slide-num">Slide 18 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/SignatureScene6_SecondDerivative_frame.png">
-              <source src="../media/videos/clips/SignatureScene6_SecondDerivative.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/SignatureScene6_SecondDerivative_frame.png">
+              <source src="media/videos/clips/SignatureScene6_SecondDerivative.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card amber-border">
             <h3 style="color: var(--amber); margin-bottom: 8px;">CURVATURE RATE</h3>
             <p style="color: #fff; font-size: 14px; font-weight: 600; margin-bottom: 12px;">f''(x) = 6x</p>
             <p style="color: var(--muted); font-size: 13px; line-height: 1.5; margin-bottom: 14px;">
-              • <strong>x = -1:</strong> f''(-1) = -6 < 0 (Concave Down ∩)<br>
+              • <strong>x = -1:</strong> f''(-1) = -6 &lt; 0 (Concave Down ∩)<br>
               Slopes are decreasing ⟹ Traps a <strong>LOCAL MAX</strong>.<br><br>
-              • <strong>x = 1:</strong> f''(1) = +6 > 0 (Concave Up ∪)<br>
+              • <strong>x = 1:</strong> f''(1) = +6 &gt; 0 (Concave Up ∪)<br>
               Slopes are increasing ⟹ Holds a <strong>LOCAL MIN</strong>.
             </p>
             <div style="background: rgba(245, 158, 11, 0.1); padding: 10px; border-radius: 6px; border: 1px solid rgba(245, 158, 11, 0.3);">
@@ -720,7 +810,7 @@
       </div>
 
       <!-- SLIDE 19: Test Comparison Matrix -->
-      <div class="slide" data-title="1st vs 2nd Test Comparison" data-notes="Explain what to do when f''(c) = 0. Stress that the 2nd test fails for cusps/corners.">
+      <div class="slide" data-title="1st vs 2nd Test Comparison">
         <div class="slide-top">
           <div><div class="meta">Comparative Analysis // Decision Logic</div><h1>Extrema Decision Matrix: 1st vs. 2nd Test</h1></div>
           <div class="slide-num">Slide 19 / 22</div>
@@ -747,8 +837,8 @@
               <p style="margin-top: 8px;"><strong style="color: #fff;">Mechanism:</strong> Computes instantaneous curvature f''(c) at a single point.</p>
               <p style="margin-top: 8px;"><strong style="color: #fff;">Outcomes:</strong></p>
               <ul style="padding-left: 20px; color: var(--text);">
-                <li>f''(c) < 0 ⟹ Concave Down ⟹ Local Max</li>
-                <li>f''(c) > 0 ⟹ Concave Up ⟹ Local Min</li>
+                <li>f''(c) &lt; 0 ⟹ Concave Down ⟹ Local Max</li>
+                <li>f''(c) &gt; 0 ⟹ Concave Up ⟹ Local Min</li>
                 <li>f''(c) = 0 ⟹ <span style="color: var(--coral); font-weight: 700;">INCONCLUSIVE!</span></li>
               </ul>
               <p style="margin-top: 12px; color: var(--amber); font-weight: 600;">Verdict: Fast when derivatives are simple; fragile.</p>
@@ -758,16 +848,20 @@
       </div>
 
       <!-- SLIDE 20: Scene 04 Video Closed Interval -->
-      <div class="slide" data-title="Closed Interval Method" data-notes="Demonstrate the Extreme Value Theorem on [-0.5, 2.5]. Show how the right endpoint 2.5 beats the local max!">
+      <div class="slide" data-title="Closed Interval Method">
         <div class="slide-top">
-          <div><div class="meta">Optimization Theory // Manim Motion</div><h1>Closed Interval Method & Candidate Matrix</h1></div>
+          <div><div class="meta">Optimization Theory // Manim Motion Animation</div><h1>Closed Interval Method & Candidate Matrix</h1></div>
           <div class="slide-num">Slide 20 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/Scene04_ClosedIntervalMethod_frame.png">
-              <source src="../media/videos/clips/Scene04_ClosedIntervalMethod.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene04_ClosedIntervalMethod_frame.png">
+              <source src="media/videos/clips/Scene04_ClosedIntervalMethod.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card green-border">
             <h3 style="color: var(--green); margin-bottom: 8px;">CANDIDATE EVALUATION</h3>
@@ -786,16 +880,20 @@
       </div>
 
       <!-- SLIDE 21: Scene 05 Video Engineering App -->
-      <div class="slide" data-title="Engineering: Maximum Power Transfer" data-notes="Show how differentiating P(R_L) using quotient rule leads to R_L = R_th. Fundamental theorem in electronics and communications.">
+      <div class="slide" data-title="Engineering: Maximum Power Transfer">
         <div class="slide-top">
-          <div><div class="meta">Engineering Application // Manim Motion</div><h1>Maximum Power Transfer Theorem</h1></div>
+          <div><div class="meta">Engineering Application // Manim Motion Animation</div><h1>Maximum Power Transfer Theorem</h1></div>
           <div class="slide-num">Slide 21 / 22</div>
         </div>
         <div class="slide-body grid-video">
           <div class="video-wrapper">
-            <video controls preload="metadata" poster="../media/frames/Scene05_MaxPowerTransfer_frame.png">
-              <source src="../media/videos/clips/Scene05_MaxPowerTransfer.mp4" type="video/mp4">
+            <video controls autoplay muted playsinline preload="auto" poster="media/frames/Scene05_MaxPowerTransfer_frame.png">
+              <source src="media/videos/clips/Scene05_MaxPowerTransfer.mp4" type="video/mp4">
             </video>
+            <div class="video-toolbar">
+              <span class="badge">🎬 Manim 1080p Video</span>
+              <button onclick="replayVideo(this)">🔁 Replay Clip</button>
+            </div>
           </div>
           <div class="card cyan-border">
             <h3 style="color: var(--cyan); margin-bottom: 8px;">CIRCUIT OPTIMIZATION</h3>
@@ -814,7 +912,7 @@
       </div>
 
       <!-- SLIDE 22: Practice Challenge & Exit Ticket -->
-      <div class="slide" data-title="Practice Problem & Exit Ticket" data-notes="4-minute active learning challenge for students. Reveal answer key progressively.">
+      <div class="slide" data-title="Practice Problem & Exit Ticket">
         <div class="slide-top">
           <div><div class="meta">Active Learning // Exit Challenge</div><h1>Practice Challenge & Verification Key</h1></div>
           <div class="slide-num">Slide 22 / 22</div>
@@ -840,8 +938,8 @@
               <p><strong style="color: var(--amber);">1. Derivative:</strong> f'(x) = 6x² - 6x - 12 = 6(x - 2)(x + 1)</p>
               <p><strong style="color: var(--amber);">2. Criticals:</strong> x = -1 & x = 2 (both in domain)</p>
               <p><strong style="color: var(--amber);">3. Concavity:</strong> f''(x) = 12x - 6<br>
-                • f''(-1) = -18 < 0 ⟹ Local Max at (-1, 12)<br>
-                • f''(2) = +18 > 0 ⟹ Local Min at (2, -15)
+                • f''(-1) = -18 &lt; 0 ⟹ Local Max at (-1, 12)<br>
+                • f''(2) = +18 &gt; 0 ⟹ Local Min at (2, -15)
               </p>
               <p><strong style="color: var(--amber);">4. Candidate Table:</strong><br>
                 f(-2) = 1 &nbsp;|&nbsp; f(-1) = 12 &nbsp;|&nbsp; f(2) = -15 &nbsp;|&nbsp; f(4) = 37
@@ -872,21 +970,43 @@
   </footer>
 
   <script>
-    // Slide Navigation
     const slides = document.querySelectorAll('.slide');
     let currentSlide = 0;
     const progressFill = document.getElementById('progressFill');
     const slideIndicator = document.getElementById('slideIndicator');
     const teleprompter = document.getElementById('teleprompter');
     const notesContent = document.getElementById('notesContent');
+    const sceneNav = document.getElementById('sceneNav');
+
+    function playSlideVideo(slideEl) {
+      const vid = slideEl.querySelector('video');
+      if (vid) {
+        vid.currentTime = 0;
+        vid.muted = true; // Ensures seamless autoplay across iPad Safari & desktop
+        const p = vid.play();
+        if (p !== undefined) {
+          p.catch(e => console.log('Autoplay hint:', e));
+        }
+      }
+    }
+
+    function replayVideo(btn) {
+      const wrapper = btn.closest('.video-wrapper');
+      if (wrapper) {
+        const vid = wrapper.querySelector('video');
+        if (vid) {
+          vid.currentTime = 0;
+          vid.play();
+        }
+      }
+    }
 
     function showSlide(index) {
       if (index < 0 || index >= slides.length) return;
       slides[currentSlide].classList.remove('active');
       
-      // Pause video on previous slide
-      const prevVid = slides[currentSlide].querySelector('video');
-      if (prevVid) prevVid.pause();
+      // Pause any running videos
+      document.querySelectorAll('video').forEach(v => v.pause());
 
       currentSlide = index;
       slides[currentSlide].classList.add('active');
@@ -894,14 +1014,24 @@
       const total = slides.length;
       progressFill.style.width = ((currentSlide + 1) / total * 100) + '%';
       slideIndicator.textContent = `${String(currentSlide + 1).padStart(2, '0')} / ${total}`;
+      if (sceneNav) sceneNav.value = currentSlide;
 
       // Update teleprompter notes
       const notes = slides[currentSlide].getAttribute('data-notes') || 'No specific notes for this slide.';
       notesContent.textContent = notes;
+
+      // Autoplay current slide's Manim video automatically
+      playSlideVideo(slides[currentSlide]);
     }
 
     document.getElementById('prevBtn').addEventListener('click', () => showSlide(currentSlide - 1));
     document.getElementById('nextBtn').addEventListener('click', () => showSlide(currentSlide + 1));
+
+    if (sceneNav) {
+      sceneNav.addEventListener('change', (e) => {
+        showSlide(parseInt(e.target.value, 10));
+      });
+    }
 
     window.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowRight' || e.key === ' ') showSlide(currentSlide + 1);
@@ -928,7 +1058,7 @@
       }
     });
 
-    // Canvas / Apple Pencil Annotation Engine
+    // Canvas / Apple Pencil Inking Engine
     const canvas = document.getElementById('pencilCanvas');
     const ctx = canvas.getContext('2d');
     const drawBtn = document.getElementById('drawBtn');
@@ -956,7 +1086,6 @@
       ctx.clearRect(0, 0, canvas.width, canvas.height);
     });
 
-    // Color pickers
     document.querySelectorAll('.color-dot').forEach(dot => {
       dot.addEventListener('click', () => {
         document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
@@ -965,7 +1094,6 @@
       });
     });
 
-    // Touch & Stylus / Apple Pencil Support
     function getPointerPos(e) {
       const rect = canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
