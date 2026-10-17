@@ -23,3 +23,7 @@ media/test_deck.pptx
 Thumbs.db
 .vscode/
 .idea/
+
+# Manim renders
+media/
+
