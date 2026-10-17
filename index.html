@@ -360,6 +360,126 @@
       margin-top: 1px;
       text-transform: uppercase;
     }
+    .pk-size-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+    .pk-size-btn {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 10px;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      border-radius: 9999px;
+      cursor: pointer;
+      font-size: 11px;
+      font-weight: 700;
+      color: #334155;
+      height: 32px;
+      transition: all 0.15s;
+    }
+    .pk-size-btn:hover, .pk-size-btn.active {
+      background: #E2E8F0;
+      border-color: #CBD5E1;
+      color: #0F172A;
+    }
+    .pk-size-dot-preview {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #007AFF;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.15);
+      transition: width 0.15s, height 0.15s, background-color 0.15s;
+    }
+    .pk-size-popover {
+      position: absolute;
+      bottom: calc(100% + 14px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.98);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border-radius: 18px;
+      box-shadow: 0 16px 36px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(0, 0, 0, 0.08);
+      padding: 14px 16px;
+      width: 230px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 120;
+      touch-action: auto !important;
+      user-select: none;
+      -webkit-user-select: none;
+      animation: pkPopIn 0.16s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pk-size-popover.hidden {
+      display: none !important;
+    }
+    .pk-size-popover::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 7px;
+      border-style: solid;
+      border-color: rgba(255, 255, 255, 0.98) transparent transparent transparent;
+    }
+    @keyframes pkPopIn {
+      from { opacity: 0; transform: translateX(-50%) translateY(6px) scale(0.96); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+    }
+    .pk-size-presets {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #F8FAFC;
+      border-radius: 12px;
+      padding: 5px 8px;
+      border: 1px solid #E2E8F0;
+    }
+    .pk-preset-circle {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: transparent;
+      border: 2px solid transparent;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      padding: 0;
+      transition: all 0.15s;
+    }
+    .pk-preset-circle span {
+      display: block;
+      border-radius: 50%;
+      background: #64748B;
+      transition: all 0.15s;
+    }
+    .pk-preset-circle:hover {
+      background: #E2E8F0;
+    }
+    .pk-preset-circle.active {
+      background: #EFF6FF;
+      border-color: #3B82F6;
+    }
+    .pk-preset-circle.active span {
+      background: #1D4ED8;
+      transform: scale(1.15);
+    }
+    .pk-stroke-preview-box {
+      height: 28px;
+      background: #F1F5F9;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 10px;
+    }
     .pk-swatch {
       width: 20px;
       height: 20px;
@@ -546,6 +666,37 @@
           <span class="pk-tool-sub">Eraser</span>
         </button>
         <button class="pk-circle-btn danger" id="pkClearBtn" title="Clear Slide Ink" style="width:28px;height:28px;font-size:12px;margin-left:2px;">🗑️</button>
+        <div class="pk-divider"></div>
+
+        <!-- Stroke Size Selector & Popover -->
+        <div class="pk-size-wrap">
+          <button class="pk-size-btn" id="pkSizeBtn" title="Pen Stroke Thickness (Tap to adjust size)">
+            <span class="pk-size-dot-preview" id="pkSizeDotPreview"></span>
+            <span class="pk-size-label" id="pkSizeLabel">3.0 px</span>
+          </button>
+          <div class="pk-size-popover hidden" id="pkSizePopover">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+              <span style="font-size:11px; font-weight:700; color:#475569; text-transform:uppercase; letter-spacing:0.5px;">Stroke Size</span>
+              <span id="pkSizeValueDisplay" style="font-size:12px; font-weight:800; color:#007AFF;">3.0 px</span>
+            </div>
+            <div class="pk-size-presets">
+              <button class="pk-preset-circle" data-size="1.5" title="Hairline (1.5px)"><span style="width:4px; height:4px;"></span></button>
+              <button class="pk-preset-circle active" data-size="3" title="Standard (3px)"><span style="width:7px; height:7px;"></span></button>
+              <button class="pk-preset-circle" data-size="5" title="Medium (5px)"><span style="width:11px; height:11px;"></span></button>
+              <button class="pk-preset-circle" data-size="8" title="Thick (8px)"><span style="width:15px; height:15px;"></span></button>
+              <button class="pk-preset-circle" data-size="14" title="Marker (14px)"><span style="width:20px; height:20px;"></span></button>
+            </div>
+            <div style="display:flex; align-items:center; gap:8px;">
+              <span style="font-size:10px; color:#64748B; font-weight:700;">1</span>
+              <input type="range" id="pkSizeSlider" min="1" max="25" step="0.5" value="3" style="flex:1; accent-color:#007AFF; cursor:pointer;">
+              <span style="font-size:10px; color:#64748B; font-weight:700;">25</span>
+            </div>
+            <div class="pk-stroke-preview-box">
+              <div id="pkStrokePreviewLine" style="height:3px; background:#007AFF; border-radius:9999px; width:80%; transition:height 0.1s, background-color 0.15s;"></div>
+            </div>
+          </div>
+        </div>
+
         <div class="pk-divider"></div>
         <div class="pk-swatch" style="background:#0F172A;" data-color="#0F172A" title="Ink Black"></div>
         <div class="pk-swatch active" style="background:#007AFF;" data-color="#007AFF" title="Apple Blue"></div>
@@ -1391,6 +1542,16 @@
         toggleFullscreen();
       } else if (e.key === 'd' || e.key === 'D') {
         toggleDrawing();
+      } else if (e.key === '[' || e.key === '{') {
+        if (typeof setStrokeSize === 'function') {
+          setStrokeSize(currentStrokeSize - (currentStrokeSize <= 3 ? 0.5 : 1));
+          showToast(`🖊 Stroke: ${currentStrokeSize % 1 === 0 ? currentStrokeSize.toFixed(0) : currentStrokeSize.toFixed(1)} px`);
+        }
+      } else if (e.key === ']' || e.key === '}') {
+        if (typeof setStrokeSize === 'function') {
+          setStrokeSize(currentStrokeSize + (currentStrokeSize < 3 ? 0.5 : 1));
+          showToast(`🖊 Stroke: ${currentStrokeSize % 1 === 0 ? currentStrokeSize.toFixed(0) : currentStrokeSize.toFixed(1)} px`);
+        }
       }
     });
 
@@ -1436,6 +1597,7 @@
     let activePointerId = null;
     let currentTool = 'pen'; // 'pen', 'pencil', 'highlighter', 'eraser'
     let currentColor = '#007AFF'; // Apple Blue default
+    let currentStrokeSize = 3.0; // Stroke size in px
     let palmRejectionEnabled = true; // Strict Apple Pencil hardware filter
 
     let undoStack = [];
@@ -1581,6 +1743,10 @@
     };
 
     function setTool(toolName) {
+      if (currentTool === toolName) {
+        toggleSizePopover();
+        return;
+      }
       currentTool = toolName;
       Object.values(tools).forEach(btn => btn.classList.remove('active'));
       if (tools[toolName]) tools[toolName].classList.add('active');
@@ -1591,12 +1757,99 @@
     tools.highlighter.addEventListener('click', () => setTool('highlighter'));
     tools.eraser.addEventListener('click', () => setTool('eraser'));
 
+    // Stroke Size Management & Apple-style Popover
+    const pkSizeBtn = document.getElementById('pkSizeBtn');
+    const pkSizePopover = document.getElementById('pkSizePopover');
+    const pkSizeLabel = document.getElementById('pkSizeLabel');
+    const pkSizeDotPreview = document.getElementById('pkSizeDotPreview');
+    const pkSizeValueDisplay = document.getElementById('pkSizeValueDisplay');
+    const pkSizeSlider = document.getElementById('pkSizeSlider');
+    const pkStrokePreviewLine = document.getElementById('pkStrokePreviewLine');
+
+    function toggleSizePopover(force) {
+      if (!pkSizePopover) return;
+      const willOpen = (typeof force === 'boolean') ? force : pkSizePopover.classList.contains('hidden');
+      if (willOpen) {
+        pkSizePopover.classList.remove('hidden');
+        if (pkSizeBtn) pkSizeBtn.classList.add('active');
+      } else {
+        pkSizePopover.classList.add('hidden');
+        if (pkSizeBtn) pkSizeBtn.classList.remove('active');
+      }
+    }
+
+    if (pkSizeBtn) {
+      pkSizeBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSizePopover();
+      });
+    }
+
+    function setStrokeSize(size) {
+      currentStrokeSize = Math.max(1, Math.min(25, parseFloat(size) || 3.0));
+      const displayStr = (currentStrokeSize % 1 === 0 ? currentStrokeSize.toFixed(0) : currentStrokeSize.toFixed(1)) + ' px';
+
+      if (pkSizeLabel) pkSizeLabel.textContent = displayStr;
+      if (pkSizeValueDisplay) pkSizeValueDisplay.textContent = displayStr;
+      if (pkSizeSlider) pkSizeSlider.value = currentStrokeSize;
+
+      if (pkSizeDotPreview) {
+        const dotD = Math.min(16, Math.max(4, Math.round(currentStrokeSize * 1.5)));
+        pkSizeDotPreview.style.width = `${dotD}px`;
+        pkSizeDotPreview.style.height = `${dotD}px`;
+        pkSizeDotPreview.style.backgroundColor = currentColor;
+      }
+
+      if (pkStrokePreviewLine) {
+        pkStrokePreviewLine.style.height = `${Math.max(1.5, Math.min(20, currentStrokeSize))}px`;
+        pkStrokePreviewLine.style.backgroundColor = currentColor;
+      }
+
+      document.querySelectorAll('.pk-preset-circle').forEach(btn => {
+        const s = parseFloat(btn.getAttribute('data-size'));
+        if (Math.abs(s - currentStrokeSize) < 0.3) {
+          btn.classList.add('active');
+        } else {
+          btn.classList.remove('active');
+        }
+      });
+    }
+
+    if (pkSizeSlider) {
+      pkSizeSlider.addEventListener('input', (e) => {
+        setStrokeSize(e.target.value);
+      });
+    }
+
+    document.querySelectorAll('.pk-preset-circle').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const size = parseFloat(btn.getAttribute('data-size'));
+        setStrokeSize(size);
+      });
+    });
+
+    function updatePreviewColors() {
+      if (pkSizeDotPreview) pkSizeDotPreview.style.backgroundColor = currentColor;
+      if (pkStrokePreviewLine) pkStrokePreviewLine.style.backgroundColor = currentColor;
+    }
+
+    // Dismiss popover on outside tap
+    document.addEventListener('pointerdown', (e) => {
+      if (pkSizePopover && !pkSizePopover.classList.contains('hidden')) {
+        if (!e.target.closest('#pkSizePopover') && !e.target.closest('#pkSizeBtn') && !e.target.closest('.pk-tool')) {
+          toggleSizePopover(false);
+        }
+      }
+    });
+
     // Color Swatches
     document.querySelectorAll('.pk-swatch').forEach(swatch => {
       swatch.addEventListener('click', () => {
         document.querySelectorAll('.pk-swatch').forEach(s => s.classList.remove('active'));
         swatch.classList.add('active');
         currentColor = swatch.getAttribute('data-color');
+        updatePreviewColors();
         if (currentTool === 'eraser') setTool('pen');
       });
     });
@@ -1604,6 +1857,7 @@
     const customColorInput = document.getElementById('pkCustomColor');
     customColorInput.addEventListener('input', (e) => {
       currentColor = e.target.value;
+      updatePreviewColors();
       document.querySelectorAll('.pk-swatch').forEach(s => s.classList.remove('active'));
       if (currentTool === 'eraser') setTool('pen');
     });
@@ -1661,27 +1915,30 @@
 
     function applyToolStyle(e) {
       const pressure = (e.pressure && e.pressure > 0) ? e.pressure : 0.5;
+      const baseSize = currentStrokeSize;
+      const scale = baseSize / 3.0;
+
       if (currentTool === 'eraser') {
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 28;
+        ctx.lineWidth = Math.max(8, 28 * scale);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
       } else if (currentTool === 'highlighter') {
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = hexToRgba(currentColor, 0.35);
-        ctx.lineWidth = 22;
+        ctx.lineWidth = Math.max(8, 22 * scale);
         ctx.lineCap = 'square';
         ctx.lineJoin = 'miter';
       } else if (currentTool === 'pencil') {
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = hexToRgba(currentColor, 0.85);
-        ctx.lineWidth = 1.8 + pressure * 2.2;
+        ctx.lineWidth = Math.max(0.8, (1.6 + pressure * 2.2) * scale);
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-      } else { // 'pen' (crisp, vector smooth)
+      } else { // 'pen' (crisp, vector smooth monoline / pressure response)
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = currentColor;
-        ctx.lineWidth = 2.4 + pressure * 3.6;
+        ctx.lineWidth = Math.max(0.8, baseSize * (0.75 + pressure * 0.5));
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
       }
@@ -1692,6 +1949,9 @@
       if (!isAllowedPointer(e)) {
         e.preventDefault();
         return;
+      }
+      if (pkSizePopover && !pkSizePopover.classList.contains('hidden')) {
+        toggleSizePopover(false);
       }
       isDrawing = true;
       activePointerId = e.pointerId;
@@ -1704,7 +1964,7 @@
 
       ctx.beginPath();
       ctx.moveTo(pos.x, pos.y);
-      ctx.arc(pos.x, pos.y, (ctx.lineWidth || 2.5) / 3, 0, Math.PI * 2);
+      ctx.arc(pos.x, pos.y, Math.max(1, (ctx.lineWidth || currentStrokeSize) / 2), 0, Math.PI * 2);
       ctx.fill();
       ctx.beginPath();
       ctx.moveTo(pos.x, pos.y);
@@ -1979,6 +2239,10 @@
         }
       }
     });
+
+    // Initialize pen stroke size & swatches
+    if (typeof setStrokeSize === 'function') setStrokeSize(3.0);
+    if (typeof updatePreviewColors === 'function') updatePreviewColors();
 
     // Initial load
     showSlide(0);
