@@ -12,7 +12,7 @@ from common_theme import *
 # -------------------------------------------------------------
 class SignatureScene1_TheFunction(Scene):
     def construct(self):
-        header = create_header("Signature Scene 1: The Function Landscape", "Tracing vertical displacement and turning behavior", CYAN)
+        header = create_header("The Cubic Function Landscape", "Tracing vertical displacement and turning behavior along f(x) = x³ - 3x", CYAN)
         self.play(Write(header), run_time=1.0)
 
         # Coordinate System
@@ -79,7 +79,7 @@ class SignatureScene1_TheFunction(Scene):
 # -------------------------------------------------------------
 class SignatureScene2_TheTangent(Scene):
     def construct(self):
-        header = create_header("Signature Scene 2: Dynamic Tangent & Slope", "Vanishing rate of change at turning points: f'(x) = 0", AMBER)
+        header = create_header("Dynamic Tangent & Instantaneous Slope", "Vanishing rate of change at turning points: f'(x) = 0", AMBER)
         self.play(Write(header), run_time=1.0)
 
         # Coordinate System
@@ -179,7 +179,7 @@ class SignatureScene2_TheTangent(Scene):
 # -------------------------------------------------------------
 class SignatureScene3_EquationMorph(Scene):
     def construct(self):
-        header = create_header("Signature Scene 3: Equation Morphing", "Factoring f'(x) to isolate critical numbers x = -1 and x = +1", AMBER)
+        header = create_header("Algebraic Factoring & Critical Roots", "Factoring f'(x) to isolate critical numbers x = -1 and x = +1", AMBER)
         self.play(Write(header), run_time=1.0)
 
         # Left Graph
@@ -245,7 +245,7 @@ class SignatureScene3_EquationMorph(Scene):
 # -------------------------------------------------------------
 class SignatureScene4_DerivativeTest(Scene):
     def construct(self):
-        header = create_header("Signature Scene 4: The First Derivative Test", "Evaluating sign changes across critical partitions", CYAN)
+        header = create_header("The First Derivative Test", "Evaluating sign changes across critical partitions", CYAN)
         self.play(Write(header), run_time=1.0)
 
         num_line = NumberLine(
@@ -315,7 +315,7 @@ class SignatureScene4_DerivativeTest(Scene):
 # -------------------------------------------------------------
 class SignatureScene5_ExtremaReveal(Scene):
     def construct(self):
-        header = create_header("Signature Scene 5: Coordinates & Verification", "Evaluating original function f(x) to anchor extrema heights", CYAN)
+        header = create_header("Extrema Coordinates & Verification", "Evaluating original function f(x) to anchor extrema heights", CYAN)
         self.play(Write(header), run_time=1.0)
 
         # Full Dual-Graph Display
@@ -370,7 +370,7 @@ class SignatureScene5_ExtremaReveal(Scene):
 # -------------------------------------------------------------
 class SignatureScene6_SecondDerivative(Scene):
     def construct(self):
-        header = create_header("Signature Scene 6: Second Derivative & Concavity", "Bending rate of change f''(x) = 6x verifies extrema", AMBER)
+        header = create_header("Second Derivative & Concavity Bending", "Bending rate of change f''(x) = 6x verifies extrema", AMBER)
         self.play(Write(header), run_time=1.0)
 
         # Transformation of Equation: f'(x) -> f''(x)
@@ -419,7 +419,7 @@ class SignatureScene6_SecondDerivative(Scene):
 # -------------------------------------------------------------
 class SignatureScene7_Counterexample(Scene):
     def construct(self):
-        header = create_header("Signature Scene 7: Misconception Counterexample", "g'(0) = 0 without an extremum: The stationary inflection trap", CORAL)
+        header = create_header("Inflection Terrace Counterexample", "g'(0) = 0 without an extremum: The stationary inflection trap", CORAL)
         self.play(Write(header), run_time=1.0)
 
         # Coordinate axes
@@ -470,7 +470,7 @@ class SignatureScene7_Counterexample(Scene):
 class SignatureSequenceMaster(Scene):
     def construct(self):
         # 1. Coordinate plane & Curve f(x) = x³ - 3x
-        header = create_header("Unified Master Sequence: The Cubic Manifold", "f(x) = x³ - 3x: Continuous Kinematic Derivation", CYAN)
+        header = create_header("The Cubic Function: Complete Calculus Flow", "f(x) = x³ - 3x: Continuous Kinematic Derivation", CYAN)
         self.play(Write(header), run_time=0.8)
 
         axes = Axes(
