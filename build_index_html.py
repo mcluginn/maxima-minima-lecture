@@ -24,16 +24,22 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       --muted: #94A3B8;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
+    html, body {
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
       overflow: hidden;
       height: 100vh;
+      width: 100vw;
+      position: fixed;
       display: flex;
       flex-direction: column;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: none !important;
+      overscroll-behavior: none !important;
+      -webkit-tap-highlight-color: transparent;
     }
 
     /* Minimalist Top Control Bar */
@@ -100,6 +106,8 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       justify-content: center;
       padding: 12px;
       background: radial-gradient(circle at 50% 30%, rgba(19, 27, 46, 0.5) 0%, #0B0F19 80%);
+      touch-action: none !important;
+      overscroll-behavior: none !important;
     }
     .slide-container {
       width: 100%;
@@ -113,6 +121,12 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       overflow: hidden;
       box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85);
       border: 1px solid rgba(51, 65, 85, 0.3);
+      touch-action: none !important;
+      overscroll-behavior: none !important;
+    }
+    .slide-container.drawing-locked * {
+      user-select: none !important;
+      -webkit-user-select: none !important;
     }
 
     /* Seamless Keynote-Style Slide Crossfade */
@@ -244,26 +258,163 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      z-index: 50;
+      z-index: 60;
       pointer-events: none;
+      touch-action: none !important;
     }
     #pencilCanvas.active {
       pointer-events: auto;
       cursor: crosshair;
     }
 
-    /* Floating Apple Pencil Palette Pill */
-    .color-dot {
-      width: 18px;
-      height: 18px;
+    /* Native-Grade Apple PencilKit Floating Palette (Replica of iPadOS PKToolPicker) */
+    .pencilkit-toolbar {
+      position: absolute;
+      bottom: 22px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.97);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 9999px;
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(0, 0, 0, 0.08);
+      padding: 6px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      z-index: 100;
+      touch-action: none !important;
+      user-select: none;
+      -webkit-user-select: none;
+      transition: opacity 0.2s, transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .pencilkit-toolbar.hidden {
+      display: none;
+    }
+    .pencilkit-handle {
+      position: absolute;
+      top: 3px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px;
+      height: 3.5px;
+      background: #D1D5DB;
+      border-radius: 2px;
+      cursor: grab;
+    }
+    .pk-circle-btn {
+      width: 32px;
+      height: 32px;
       border-radius: 50%;
+      background: #F1F5F9;
+      border: 1px solid #E2E8F0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: #475569;
+      font-size: 14px;
+      padding: 0;
+      transition: all 0.15s;
+    }
+    .pk-circle-btn:hover {
+      background: #E2E8F0;
+      color: #0F172A;
+    }
+    .pk-circle-btn:disabled {
+      opacity: 0.3;
+      cursor: not-allowed;
+      pointer-events: none;
+    }
+    .pk-divider {
+      width: 1px;
+      height: 22px;
+      background: #E2E8F0;
+      margin: 0 2px;
+    }
+    .pk-tool {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 38px;
+      height: 48px;
+      border-radius: 10px;
       cursor: pointer;
       border: 2px solid transparent;
-      transition: transform 0.15s, border-color 0.15s;
+      background: transparent;
+      color: #475569;
+      font-size: 18px;
+      padding: 0;
+      transition: all 0.15s ease;
+      position: relative;
     }
-    .color-dot.active {
+    .pk-tool:hover {
+      background: #F8FAFC;
+    }
+    .pk-tool.active {
+      background: #EFF6FF;
+      border-color: #3B82F6;
+      color: #1D4ED8;
+      transform: translateY(-4px);
+      box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+    }
+    .pk-tool-sub {
+      font-size: 8.5px;
+      font-weight: 700;
+      letter-spacing: 0.2px;
+      color: inherit;
+      margin-top: 1px;
+      text-transform: uppercase;
+    }
+    .pk-swatch {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid #FFFFFF;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+      transition: transform 0.15s, box-shadow 0.15s;
+      position: relative;
+    }
+    .pk-swatch.active {
       transform: scale(1.25);
-      border-color: #fff;
+      box-shadow: 0 0 0 2px #0284C7, 0 3px 6px rgba(0,0,0,0.25);
+    }
+    .pk-badge-palm {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      padding: 5px 10px;
+      background: #F0FDF4;
+      border: 1px solid #BBF7D0;
+      border-radius: 9999px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #166534;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: all 0.2s;
+    }
+    .pk-badge-palm.off {
+      background: #FEF2F2;
+      border-color: #FECACA;
+      color: #991B1B;
+    }
+    .pk-color-picker-wrap {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+      cursor: pointer;
+      box-shadow: 0 0 0 1px rgba(0,0,0,0.2);
+    }
+    .pk-color-picker-wrap input[type="color"] {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      opacity: 0;
+      cursor: pointer;
     }
 
     /* Bottom Control Strip */
@@ -356,12 +507,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       </select>
 
       <div style="display: flex; align-items: center; gap: 6px;">
-        <button id="drawBtn" title="Toggle Apple Pencil Inking">✍️ Draw</button>
-        <div class="color-dot active" style="background: #38BDF8;" data-color="#38BDF8" title="Cyan"></div>
-        <div class="color-dot" style="background: #F59E0B;" data-color="#F59E0B" title="Amber"></div>
-        <div class="color-dot" style="background: #F43F5E;" data-color="#F43F5E" title="Coral"></div>
-        <div class="color-dot" style="background: #FFFFFF;" data-color="#FFFFFF" title="White"></div>
-        <button id="clearInkBtn" class="danger" title="Clear Ink">Clear</button>
+        <button id="drawBtn" title="Toggle Apple Pencil Inking">✍️ Apple Pencil</button>
       </div>
 
       <a href="maxima_minima_lecture.pptx" download style="text-decoration:none;">
@@ -376,6 +522,46 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
   <div class="main-stage">
     <div class="slide-container" id="stageContainer">
       <canvas id="pencilCanvas"></canvas>
+
+      <!-- Floating Apple PencilKit Toolbar (Exact Replica of iPadOS PKToolPicker) -->
+      <div id="pencilKitToolbar" class="pencilkit-toolbar hidden">
+        <div class="pencilkit-handle" title="Drag to reposition toolbar"></div>
+        <button class="pk-circle-btn" id="pkUndoBtn" title="Undo (Apple Pencil)" disabled>↺</button>
+        <button class="pk-circle-btn" id="pkRedoBtn" title="Redo (Apple Pencil)" disabled>↻</button>
+        <div class="pk-divider"></div>
+        <button class="pk-tool active" id="toolPen" title="Fine Monoline Pen">
+          <span>✒️</span>
+          <span class="pk-tool-sub">Pen</span>
+        </button>
+        <button class="pk-tool" id="toolPencil" title="Graphite Pencil">
+          <span>✏️</span>
+          <span class="pk-tool-sub">Pencil</span>
+        </button>
+        <button class="pk-tool" id="toolHighlighter" title="Translucent Highlighter">
+          <span>🖍️</span>
+          <span class="pk-tool-sub">Marker</span>
+        </button>
+        <button class="pk-tool" id="toolEraser" title="Stroke Eraser">
+          <span>🧽</span>
+          <span class="pk-tool-sub">Eraser</span>
+        </button>
+        <button class="pk-circle-btn danger" id="pkClearBtn" title="Clear Slide Ink" style="width:28px;height:28px;font-size:12px;margin-left:2px;">🗑️</button>
+        <div class="pk-divider"></div>
+        <div class="pk-swatch" style="background:#0F172A;" data-color="#0F172A" title="Ink Black"></div>
+        <div class="pk-swatch active" style="background:#007AFF;" data-color="#007AFF" title="Apple Blue"></div>
+        <div class="pk-swatch" style="background:#34C759;" data-color="#34C759" title="Apple Green"></div>
+        <div class="pk-swatch" style="background:#FF9500;" data-color="#FF9500" title="Apple Amber"></div>
+        <div class="pk-swatch" style="background:#FF3B30;" data-color="#FF3B30" title="Apple Red"></div>
+        <div class="pk-swatch" style="background:#FFFFFF; box-shadow:0 0 0 1px #CBD5E1;" data-color="#FFFFFF" title="Chalk White"></div>
+        <div class="pk-color-picker-wrap" title="Custom Color Palette">
+          <input type="color" id="pkCustomColor" value="#38BDF8">
+        </div>
+        <div class="pk-divider"></div>
+        <div class="pk-badge-palm" id="pkPalmBadge" title="Tap to toggle: Strict Apple Pencil (Palm Rejected) vs Touch Inking">
+          <span> Palm Rejection: ON</span>
+        </div>
+        <button class="pk-circle-btn" id="pkCloseBtn" title="Close Pencil Toolbar" style="width:26px;height:26px;font-size:11px;">✕</button>
+      </div>
 
       <!-- SLIDE 1: Title -->
       <div class="slide active" data-title="Title Slide">
@@ -1122,6 +1308,17 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function showSlide(index) {
       if (index < 0 || index >= slides.length) return;
 
+      // Cache ink from outgoing slide
+      if (canvas.width > 0 && canvas.height > 0) {
+        try {
+          slideInkCache[currentSlide] = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        } catch (e) {}
+      }
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      undoStack = [];
+      redoStack = [];
+      updateHistoryButtons();
+
       // Pause old slide video
       pauseSlideVideo(slides[currentSlide]);
       slides[currentSlide].classList.remove('active');
@@ -1131,6 +1328,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       // Activate new slide
       const newSlide = slides[currentSlide];
       newSlide.classList.add('active');
+
+      // Restore ink for incoming slide if exists
+      if (slideInkCache[currentSlide]) {
+        try {
+          ctx.putImageData(slideInkCache[currentSlide], 0, 0);
+        } catch (e) {}
+      }
 
       // Update progress & indicator
       progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
@@ -1195,90 +1399,270 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     }
     document.getElementById('fsBtn').addEventListener('click', toggleFullscreen);
 
-    // Apple Pencil / Touch Inking Engine
+    // ==========================================
+    // Apple PencilKit Native-Grade Inking Engine
+    // ==========================================
     const canvas = document.getElementById('pencilCanvas');
     const ctx = canvas.getContext('2d');
-    let isDrawing = false;
+    const pencilKitToolbar = document.getElementById('pencilKitToolbar');
+    const drawBtn = document.getElementById('drawBtn');
+    const pkPalmBadge = document.getElementById('pkPalmBadge');
+    const pkUndoBtn = document.getElementById('pkUndoBtn');
+    const pkRedoBtn = document.getElementById('pkRedoBtn');
+
     let isDrawingMode = false;
-    let currentColor = '#38BDF8';
+    let isDrawing = false;
+    let activePointerId = null;
+    let currentTool = 'pen'; // 'pen', 'pencil', 'highlighter', 'eraser'
+    let currentColor = '#007AFF'; // Apple Blue default
+    let palmRejectionEnabled = true; // Strict Apple Pencil hardware filter
+
+    const slideInkCache = {};
+    let undoStack = [];
+    let redoStack = [];
+    const MAX_HISTORY = 20;
 
     function resizeCanvas() {
       const rect = stageContainer.getBoundingClientRect();
-      canvas.width = rect.width;
-      canvas.height = rect.height;
+      if (canvas.width !== rect.width || canvas.height !== rect.height) {
+        let tempImg = null;
+        if (canvas.width > 0 && canvas.height > 0) {
+          try { tempImg = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch(e){}
+        }
+        canvas.width = rect.width;
+        canvas.height = rect.height;
+        if (tempImg) {
+          try { ctx.putImageData(tempImg, 0, 0); } catch(e){}
+        } else if (slideInkCache[currentSlide]) {
+          try { ctx.putImageData(slideInkCache[currentSlide], 0, 0); } catch(e){}
+        }
+      }
     }
     window.addEventListener('resize', resizeCanvas);
-    setTimeout(resizeCanvas, 100);
+    setTimeout(resizeCanvas, 150);
 
-    const drawBtn = document.getElementById('drawBtn');
-    function toggleDrawing() {
-      isDrawingMode = !isDrawingMode;
+    function pushUndoState() {
+      try {
+        if (undoStack.length >= MAX_HISTORY) undoStack.shift();
+        undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        redoStack = [];
+        updateHistoryButtons();
+      } catch (e) {}
+    }
+
+    function updateHistoryButtons() {
+      pkUndoBtn.disabled = undoStack.length === 0;
+      pkRedoBtn.disabled = redoStack.length === 0;
+    }
+
+    function undo() {
+      if (undoStack.length === 0) return;
+      try {
+        redoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        const prevState = undoStack.pop();
+        ctx.putImageData(prevState, 0, 0);
+        updateHistoryButtons();
+      } catch (e) {}
+    }
+
+    function redo() {
+      if (redoStack.length === 0) return;
+      try {
+        undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        const nextState = redoStack.pop();
+        ctx.putImageData(nextState, 0, 0);
+        updateHistoryButtons();
+      } catch (e) {}
+    }
+
+    pkUndoBtn.addEventListener('click', undo);
+    pkRedoBtn.addEventListener('click', redo);
+
+    function toggleDrawing(force) {
+      isDrawingMode = (typeof force === 'boolean') ? force : !isDrawingMode;
       if (isDrawingMode) {
         drawBtn.classList.add('active');
         canvas.classList.add('active');
+        stageContainer.classList.add('drawing-locked');
+        pencilKitToolbar.classList.remove('hidden');
+        resizeCanvas();
       } else {
         drawBtn.classList.remove('active');
         canvas.classList.remove('active');
+        stageContainer.classList.remove('drawing-locked');
+        pencilKitToolbar.classList.add('hidden');
       }
     }
-    drawBtn.addEventListener('click', toggleDrawing);
 
-    document.querySelectorAll('.color-dot').forEach(dot => {
-      dot.addEventListener('click', (e) => {
-        document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
-        dot.classList.add('active');
-        currentColor = dot.getAttribute('data-color');
+    drawBtn.addEventListener('click', () => toggleDrawing());
+    document.getElementById('pkCloseBtn').addEventListener('click', () => toggleDrawing(false));
+
+    // Tool switching
+    const tools = {
+      pen: document.getElementById('toolPen'),
+      pencil: document.getElementById('toolPencil'),
+      highlighter: document.getElementById('toolHighlighter'),
+      eraser: document.getElementById('toolEraser')
+    };
+
+    function setTool(toolName) {
+      currentTool = toolName;
+      Object.values(tools).forEach(btn => btn.classList.remove('active'));
+      if (tools[toolName]) tools[toolName].classList.add('active');
+    }
+
+    tools.pen.addEventListener('click', () => setTool('pen'));
+    tools.pencil.addEventListener('click', () => setTool('pencil'));
+    tools.highlighter.addEventListener('click', () => setTool('highlighter'));
+    tools.eraser.addEventListener('click', () => setTool('eraser'));
+
+    // Color Swatches
+    document.querySelectorAll('.pk-swatch').forEach(swatch => {
+      swatch.addEventListener('click', () => {
+        document.querySelectorAll('.pk-swatch').forEach(s => s.classList.remove('active'));
+        swatch.classList.add('active');
+        currentColor = swatch.getAttribute('data-color');
+        if (currentTool === 'eraser') setTool('pen');
       });
     });
 
-    document.getElementById('clearInkBtn').addEventListener('click', () => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const customColorInput = document.getElementById('pkCustomColor');
+    customColorInput.addEventListener('input', (e) => {
+      currentColor = e.target.value;
+      document.querySelectorAll('.pk-swatch').forEach(s => s.classList.remove('active'));
+      if (currentTool === 'eraser') setTool('pen');
     });
+
+    // Clear slide ink
+    document.getElementById('pkClearBtn').addEventListener('click', () => {
+      pushUndoState();
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (slideInkCache[currentSlide]) delete slideInkCache[currentSlide];
+    });
+
+    // Palm Rejection Toggle
+    pkPalmBadge.addEventListener('click', () => {
+      palmRejectionEnabled = !palmRejectionEnabled;
+      if (palmRejectionEnabled) {
+        pkPalmBadge.classList.remove('off');
+        pkPalmBadge.innerHTML = '<span> Palm Rejection: ON</span>';
+      } else {
+        pkPalmBadge.classList.add('off');
+        pkPalmBadge.innerHTML = '<span>👆 Touch Inking: ON</span>';
+      }
+    });
+
+    function hexToRgba(hex, alpha) {
+      let c;
+      if (/^#([A-Fa-f0-9]{3}){1,2}$/.test(hex)) {
+        c = hex.substring(1).split('');
+        if (c.length === 3) c = [c[0], c[0], c[1], c[1], c[2], c[2]];
+        c = '0x' + c.join('');
+        return 'rgba(' + [(c >> 16) & 255, (c >> 8) & 255, c & 255].join(',') + ',' + alpha + ')';
+      }
+      return hex;
+    }
 
     function getPointerPos(e) {
       const rect = canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       return {
-        x: (clientX - rect.left) * (canvas.width / rect.width),
-        y: (clientY - rect.top) * (canvas.height / rect.height)
+        x: (e.clientX - rect.left) * (canvas.width / rect.width),
+        y: (e.clientY - rect.top) * (canvas.height / rect.height)
       };
     }
 
-    function startDraw(e) {
+    function isAllowedPointer(e) {
+      if (!isDrawingMode) return false;
+      if (palmRejectionEnabled) {
+        // True hardware Apple Pencil detection:
+        // iPad Safari sends pointerType: 'pen' for Apple Pencil
+        // iPad Safari sends pointerType: 'touch' for palm resting on the glass!
+        // Desktop mouse sends pointerType: 'mouse'
+        return e.pointerType === 'pen' || e.pointerType === 'mouse';
+      }
+      return true;
+    }
+
+    function applyToolStyle(e) {
+      const pressure = (e.pressure && e.pressure > 0) ? e.pressure : 0.5;
+      if (currentTool === 'eraser') {
+        ctx.globalCompositeOperation = 'destination-out';
+        ctx.lineWidth = 26;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+      } else if (currentTool === 'highlighter') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = hexToRgba(currentColor, 0.35);
+        ctx.lineWidth = 20;
+        ctx.lineCap = 'square';
+        ctx.lineJoin = 'miter';
+      } else if (currentTool === 'pencil') {
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = hexToRgba(currentColor, 0.82);
+        ctx.lineWidth = 1.8 + pressure * 2.2;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+      } else { // 'pen'
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.strokeStyle = currentColor;
+        ctx.lineWidth = 2.2 + pressure * 3.5;
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+      }
+    }
+
+    function onPointerDown(e) {
       if (!isDrawingMode) return;
+      if (!isAllowedPointer(e)) {
+        // Ignored palm or finger contact
+        e.preventDefault();
+        return;
+      }
       isDrawing = true;
+      activePointerId = e.pointerId;
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+
+      pushUndoState();
       const pos = getPointerPos(e);
+      applyToolStyle(e);
       ctx.beginPath();
       ctx.moveTo(pos.x, pos.y);
-      ctx.strokeStyle = currentColor;
-      // Handle stylus pressure if available
-      const pressure = e.pressure && e.pressure > 0 ? e.pressure : 0.5;
-      ctx.lineWidth = 2 + pressure * 4;
-      ctx.lineCap = 'round';
-      ctx.lineJoin = 'round';
       e.preventDefault();
     }
 
-    function draw(e) {
+    function onPointerMove(e) {
       if (!isDrawing || !isDrawingMode) return;
+      if (activePointerId !== null && e.pointerId !== activePointerId) {
+        // Secondary contact (such as resting palm) while stylus is down -> discard!
+        e.preventDefault();
+        return;
+      }
       const pos = getPointerPos(e);
+      applyToolStyle(e);
       ctx.lineTo(pos.x, pos.y);
       ctx.stroke();
       e.preventDefault();
     }
 
-    function stopDraw(e) {
+    function onPointerUp(e) {
       if (!isDrawing) return;
+      if (activePointerId !== null && e.pointerId !== activePointerId) return;
       isDrawing = false;
+      activePointerId = null;
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
       ctx.closePath();
+      e.preventDefault();
     }
 
-    // Pointer events for Apple Pencil pressure & tilt
-    canvas.addEventListener('pointerdown', startDraw);
-    canvas.addEventListener('pointermove', draw);
-    canvas.addEventListener('pointerup', stopDraw);
-    canvas.addEventListener('pointercancel', stopDraw);
+    canvas.addEventListener('pointerdown', onPointerDown);
+    canvas.addEventListener('pointermove', onPointerMove);
+    canvas.addEventListener('pointerup', onPointerUp);
+    canvas.addEventListener('pointercancel', onPointerUp);
+
+    // Prevent default iOS Safari touch behaviors on canvas
+    canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
+    canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+    canvas.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
 
     // Initial load
     showSlide(0);
