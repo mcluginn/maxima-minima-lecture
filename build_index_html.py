@@ -598,6 +598,9 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     <div class="brand">
       <span class="badge">Calculus</span>
       <span>Maxima & Minima // Motion-Based Lecture</span>
+      <a href="differential_equations.html" style="text-decoration:none; margin-left: 8px;">
+        <span class="badge" style="background: rgba(168, 85, 247, 0.15); border-color: rgba(168, 85, 247, 0.4); color: #C084FC; cursor: pointer;" title="Switch to Differential Equations Lecture">🔬 DE Lecture ➔</span>
+      </a>
     </div>
 
     <div class="controls">
@@ -2259,7 +2262,14 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 """
 
 def main():
-    for filepath in ["index.html", "public/index.html", "presentation/player.html"]:
+    targets = [
+        "index.html",
+        "public/index.html",
+        "maxima_minima.html",
+        "public/maxima_minima.html",
+        "presentation/maxima_minima_player.html",
+    ]
+    for filepath in targets:
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(HTML_TEMPLATE)
         print(f"Updated {filepath}")

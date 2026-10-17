@@ -525,6 +525,9 @@ DE_HTML_TEMPLATE = r"""<!DOCTYPE html>
     <div class="brand">
       <span class="brand-tag">MATHalino DE Review</span>
       <span class="brand-title">Elementary Applications of Differential Equations</span>
+      <a href="index.html" style="text-decoration:none; margin-left: 8px;">
+        <span class="brand-tag" style="background: rgba(56, 189, 248, 0.15); border-color: rgba(56, 189, 248, 0.4); color: #38BDF8; cursor: pointer;" title="Switch to Maxima & Minima Lecture">📈 Maxima & Minima ➔</span>
+      </a>
     </div>
     <div class="controls">
       <select id="sceneNav" title="Jump to Scene">
@@ -1891,7 +1894,11 @@ DE_HTML_TEMPLATE = r"""<!DOCTYPE html>
 """
 
 def main():
-    targets = ["index.html", "public/index.html", "presentation/player.html"]
+    targets = [
+        "differential_equations.html",
+        "public/differential_equations.html",
+        "presentation/de_player.html",
+    ]
     for t in targets:
         with open(t, "w", encoding="utf-8") as f:
             f.write(DE_HTML_TEMPLATE)
