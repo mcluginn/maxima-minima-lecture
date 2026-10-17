@@ -1313,37 +1313,56 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       }
     }
 
+    // Per-Slide Annotation Persistence Layers
+    const slideInkLayers = {};
+
+    function saveCurrentSlideInk() {
+      if (!canvas || canvas.width === 0 || canvas.height === 0) return;
+      const offscreen = document.createElement('canvas');
+      offscreen.width = canvas.width;
+      offscreen.height = canvas.height;
+      const offCtx = offscreen.getContext('2d');
+      offCtx.drawImage(canvas, 0, 0);
+      slideInkLayers[currentSlide] = offscreen;
+    }
+
+    function restoreSlideInk(slideIndex) {
+      if (!canvas || !ctx) return;
+      const dpr = Math.max(window.devicePixelRatio || 1, 2);
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (slideInkLayers[slideIndex]) {
+        ctx.drawImage(slideInkLayers[slideIndex], 0, 0);
+      }
+      ctx.restore();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
     function showSlide(index) {
       if (index < 0 || index >= slides.length) return;
 
-      // Cache ink from outgoing slide
-      if (canvas.width > 0 && canvas.height > 0) {
-        try {
-          slideInkCache[currentSlide] = ctx.getImageData(0, 0, canvas.width, canvas.height);
-        } catch (e) {}
-      }
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // 1. Save annotations on the outgoing slide
+      saveCurrentSlideInk();
+
+      // 2. Clear undo/redo for incoming slide
       undoStack = [];
       redoStack = [];
       updateHistoryButtons();
 
-      // Pause old slide video
+      // 3. Pause old slide video
       pauseSlideVideo(slides[currentSlide]);
       slides[currentSlide].classList.remove('active');
 
       currentSlide = index;
       resetZoom();
 
-      // Activate new slide
+      // 4. Activate new slide
       const newSlide = slides[currentSlide];
       newSlide.classList.add('active');
 
-      // Restore ink for incoming slide if exists
-      if (slideInkCache[currentSlide]) {
-        try {
-          ctx.putImageData(slideInkCache[currentSlide], 0, 0);
-        } catch (e) {}
-      }
+      // 5. Restore annotations for this slide (or leave fresh & clean)
+      restoreSlideInk(currentSlide);
 
       // Update progress & indicator
       progressFill.style.width = `${((currentSlide + 1) / slides.length) * 100}%`;
@@ -1409,7 +1428,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     document.getElementById('fsBtn').addEventListener('click', toggleFullscreen);
 
     // ==========================================
-    // Apple PencilKit Native-Grade Inking Engine
+    // Retina HiDPI Apple PencilKit Inking Engine
     // ==========================================
     const canvas = document.getElementById('pencilCanvas');
     const ctx = canvas.getContext('2d');
@@ -1426,24 +1445,52 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     let currentColor = '#007AFF'; // Apple Blue default
     let palmRejectionEnabled = true; // Strict Apple Pencil hardware filter
 
-    const slideInkCache = {};
     let undoStack = [];
     let redoStack = [];
     const MAX_HISTORY = 20;
 
+    let canvasDisplayWidth = 1360;
+    let canvasDisplayHeight = 765;
+    let lastPoint = null;
+
     function resizeCanvas() {
       const rect = stageContainer.getBoundingClientRect();
-      if (canvas.width !== rect.width || canvas.height !== rect.height) {
-        let tempImg = null;
+      const dpr = Math.max(window.devicePixelRatio || 1, 2);
+      
+      canvasDisplayWidth = stageContainer.offsetWidth || 1360;
+      canvasDisplayHeight = stageContainer.offsetHeight || 765;
+
+      const targetWidth = Math.round(canvasDisplayWidth * dpr);
+      const targetHeight = Math.round(canvasDisplayHeight * dpr);
+
+      if (canvas.width !== targetWidth || canvas.height !== targetHeight) {
+        let tempCanvas = null;
         if (canvas.width > 0 && canvas.height > 0) {
-          try { tempImg = ctx.getImageData(0, 0, canvas.width, canvas.height); } catch(e){}
+          tempCanvas = document.createElement('canvas');
+          tempCanvas.width = canvas.width;
+          tempCanvas.height = canvas.height;
+          tempCanvas.getContext('2d').drawImage(canvas, 0, 0);
         }
-        canvas.width = rect.width;
-        canvas.height = rect.height;
-        if (tempImg) {
-          try { ctx.putImageData(tempImg, 0, 0); } catch(e){}
-        } else if (slideInkCache[currentSlide]) {
-          try { ctx.putImageData(slideInkCache[currentSlide], 0, 0); } catch(e){}
+
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        canvas.style.width = canvasDisplayWidth + 'px';
+        canvas.style.height = canvasDisplayHeight + 'px';
+
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        ctx.imageSmoothingEnabled = true;
+        ctx.imageSmoothingQuality = 'high';
+
+        if (tempCanvas) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.drawImage(tempCanvas, 0, 0, targetWidth, targetHeight);
+          ctx.restore();
+        } else if (slideInkLayers[currentSlide]) {
+          ctx.save();
+          ctx.setTransform(1, 0, 0, 1, 0, 0);
+          ctx.drawImage(slideInkLayers[currentSlide], 0, 0, targetWidth, targetHeight);
+          ctx.restore();
         }
       }
     }
@@ -1453,7 +1500,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function pushUndoState() {
       try {
         if (undoStack.length >= MAX_HISTORY) undoStack.shift();
-        undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        const snap = document.createElement('canvas');
+        snap.width = canvas.width;
+        snap.height = canvas.height;
+        snap.getContext('2d').drawImage(canvas, 0, 0);
+        undoStack.push(snap);
         redoStack = [];
         updateHistoryButtons();
       } catch (e) {}
@@ -1467,9 +1518,20 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function undo() {
       if (undoStack.length === 0) return;
       try {
-        redoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        const snap = document.createElement('canvas');
+        snap.width = canvas.width;
+        snap.height = canvas.height;
+        snap.getContext('2d').drawImage(canvas, 0, 0);
+        redoStack.push(snap);
+
         const prevState = undoStack.pop();
-        ctx.putImageData(prevState, 0, 0);
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(prevState, 0, 0);
+        ctx.restore();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         updateHistoryButtons();
       } catch (e) {}
     }
@@ -1477,9 +1539,20 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function redo() {
       if (redoStack.length === 0) return;
       try {
-        undoStack.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        const snap = document.createElement('canvas');
+        snap.width = canvas.width;
+        snap.height = canvas.height;
+        snap.getContext('2d').drawImage(canvas, 0, 0);
+        undoStack.push(snap);
+
         const nextState = redoStack.pop();
-        ctx.putImageData(nextState, 0, 0);
+        const dpr = Math.max(window.devicePixelRatio || 1, 2);
+        ctx.save();
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(nextState, 0, 0);
+        ctx.restore();
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
         updateHistoryButtons();
       } catch (e) {}
     }
@@ -1545,8 +1618,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     // Clear slide ink
     document.getElementById('pkClearBtn').addEventListener('click', () => {
       pushUndoState();
+      delete slideInkLayers[currentSlide];
+      const dpr = Math.max(window.devicePixelRatio || 1, 2);
+      ctx.save();
+      ctx.setTransform(1, 0, 0, 1, 0, 0);
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      if (slideInkCache[currentSlide]) delete slideInkCache[currentSlide];
+      ctx.restore();
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     });
 
     // Palm Rejection Toggle
@@ -1575,18 +1653,14 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function getPointerPos(e) {
       const rect = canvas.getBoundingClientRect();
       return {
-        x: (e.clientX - rect.left) * (canvas.width / rect.width),
-        y: (e.clientY - rect.top) * (canvas.height / rect.height)
+        x: (e.clientX - rect.left) * (canvasDisplayWidth / rect.width),
+        y: (e.clientY - rect.top) * (canvasDisplayHeight / rect.height)
       };
     }
 
     function isAllowedPointer(e) {
       if (!isDrawingMode) return false;
       if (palmRejectionEnabled) {
-        // True hardware Apple Pencil detection:
-        // iPad Safari sends pointerType: 'pen' for Apple Pencil
-        // iPad Safari sends pointerType: 'touch' for palm resting on the glass!
-        // Desktop mouse sends pointerType: 'mouse'
         return e.pointerType === 'pen' || e.pointerType === 'mouse';
       }
       return true;
@@ -1596,25 +1670,25 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       const pressure = (e.pressure && e.pressure > 0) ? e.pressure : 0.5;
       if (currentTool === 'eraser') {
         ctx.globalCompositeOperation = 'destination-out';
-        ctx.lineWidth = 26;
+        ctx.lineWidth = 28;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
       } else if (currentTool === 'highlighter') {
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = hexToRgba(currentColor, 0.35);
-        ctx.lineWidth = 20;
+        ctx.lineWidth = 22;
         ctx.lineCap = 'square';
         ctx.lineJoin = 'miter';
       } else if (currentTool === 'pencil') {
         ctx.globalCompositeOperation = 'source-over';
-        ctx.strokeStyle = hexToRgba(currentColor, 0.82);
+        ctx.strokeStyle = hexToRgba(currentColor, 0.85);
         ctx.lineWidth = 1.8 + pressure * 2.2;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
-      } else { // 'pen'
+      } else { // 'pen' (crisp, vector smooth)
         ctx.globalCompositeOperation = 'source-over';
         ctx.strokeStyle = currentColor;
-        ctx.lineWidth = 2.2 + pressure * 3.5;
+        ctx.lineWidth = 2.4 + pressure * 3.6;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
       }
@@ -1623,7 +1697,6 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function onPointerDown(e) {
       if (!isDrawingMode) return;
       if (!isAllowedPointer(e)) {
-        // Ignored palm or finger contact
         e.preventDefault();
         return;
       }
@@ -1633,7 +1706,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
       pushUndoState();
       const pos = getPointerPos(e);
+      lastPoint = pos;
       applyToolStyle(e);
+
+      ctx.beginPath();
+      ctx.moveTo(pos.x, pos.y);
+      ctx.arc(pos.x, pos.y, (ctx.lineWidth || 2.5) / 3, 0, Math.PI * 2);
+      ctx.fill();
       ctx.beginPath();
       ctx.moveTo(pos.x, pos.y);
       e.preventDefault();
@@ -1642,14 +1721,21 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     function onPointerMove(e) {
       if (!isDrawing || !isDrawingMode) return;
       if (activePointerId !== null && e.pointerId !== activePointerId) {
-        // Secondary contact (such as resting palm) while stylus is down -> discard!
         e.preventDefault();
         return;
       }
       const pos = getPointerPos(e);
+      if (!lastPoint) { lastPoint = pos; return; }
+
       applyToolStyle(e);
-      ctx.lineTo(pos.x, pos.y);
+      // Midpoint Bezier quadratic smoothing for vector-grade line curvature
+      const midX = (lastPoint.x + pos.x) / 2;
+      const midY = (lastPoint.y + pos.y) / 2;
+
+      ctx.quadraticCurveTo(lastPoint.x, lastPoint.y, midX, midY);
       ctx.stroke();
+
+      lastPoint = pos;
       e.preventDefault();
     }
 
@@ -1658,6 +1744,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       if (activePointerId !== null && e.pointerId !== activePointerId) return;
       isDrawing = false;
       activePointerId = null;
+      lastPoint = null;
       try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
       ctx.closePath();
       e.preventDefault();
@@ -1750,7 +1837,6 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         e.preventDefault();
       } else if (e.touches && e.touches.length === 1) {
         // Single touch (palm resting or finger)
-        // If drawing mode is active, prevent card scrolling so resting palm doesn't drag
         if (isDrawingMode && palmRejectionEnabled) {
           e.preventDefault();
         }
@@ -1773,6 +1859,121 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
           resetZoom();
         }
         lastTwoFingerTap = now;
+      }
+    });
+
+    // =========================================================================
+    // Multi-Tap Slide Hotkeys (Double-Tap = Next Slide, Triple-Tap = Back Slide)
+    // =========================================================================
+    let tapCount = 0;
+    let tapTimeout = null;
+    let touchStartX = 0, touchStartY = 0, touchStartTime = 0;
+    const TAP_THRESHOLD_MS = 320;
+    const TAP_MOVE_LIMIT = 15;
+
+    function showToast(message) {
+      let toast = document.getElementById('slideToast');
+      if (!toast) {
+        toast = document.createElement('div');
+        toast.id = 'slideToast';
+        toast.style.cssText = `
+          position: fixed;
+          top: 66px;
+          left: 50%;
+          transform: translateX(-50%);
+          background: rgba(15, 23, 42, 0.94);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(56, 189, 248, 0.6);
+          color: #38BDF8;
+          padding: 8px 20px;
+          border-radius: 20px;
+          font-size: 13.5px;
+          font-weight: 700;
+          letter-spacing: 0.3px;
+          z-index: 999;
+          box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+          pointer-events: none;
+          opacity: 0;
+          transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+        `;
+        document.body.appendChild(toast);
+      }
+      toast.textContent = message;
+      toast.style.opacity = '1';
+      toast.style.transform = 'translateX(-50%) translateY(0px)';
+      clearTimeout(toast._timer);
+      toast._timer = setTimeout(() => {
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateX(-50%) translateY(-10px)';
+      }, 1300);
+    }
+
+    function processTapGesture(target) {
+      if (target.closest('header') || target.closest('#pencilKitToolbar') || target.closest('button') || target.closest('select')) {
+        return;
+      }
+
+      tapCount++;
+      if (tapTimeout) clearTimeout(tapTimeout);
+
+      if (tapCount === 3) {
+        // TRIPLE TAP -> PREVIOUS SLIDE!
+        tapCount = 0;
+        showSlide(currentSlide - 1);
+        showToast(`⏮ Slide ${String(currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')} (Triple Tap)`);
+        return;
+      }
+
+      tapTimeout = setTimeout(() => {
+        if (tapCount === 2) {
+          // DOUBLE TAP -> NEXT SLIDE!
+          showSlide(currentSlide + 1);
+          showToast(`⏭ Slide ${String(currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')} (Double Tap)`);
+        }
+        tapCount = 0;
+      }, TAP_THRESHOLD_MS);
+    }
+
+    stageContainer.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length === 1) {
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+        touchStartTime = Date.now();
+      }
+    }, { passive: true });
+
+    stageContainer.addEventListener('touchend', (e) => {
+      if (e.changedTouches && e.changedTouches.length === 1) {
+        const dx = Math.abs(e.changedTouches[0].clientX - touchStartX);
+        const dy = Math.abs(e.changedTouches[0].clientY - touchStartY);
+        const dt = Date.now() - touchStartTime;
+        if (dx < TAP_MOVE_LIMIT && dy < TAP_MOVE_LIMIT && dt < 320) {
+          // In drawing mode, only fingers trigger slide changes so Apple Pencil can write freely
+          if (!isDrawingMode || (e.changedTouches[0].touchType !== 'stylus')) {
+            processTapGesture(e.target);
+          }
+        }
+      }
+    }, { passive: true });
+
+    let clickStartX = 0, clickStartY = 0, clickStartTime = 0;
+    stageContainer.addEventListener('pointerdown', (e) => {
+      if (e.pointerType === 'mouse') {
+        clickStartX = e.clientX;
+        clickStartY = e.clientY;
+        clickStartTime = Date.now();
+      }
+    });
+
+    stageContainer.addEventListener('pointerup', (e) => {
+      if (e.pointerType === 'mouse' && !isDrawingMode) {
+        const dx = Math.abs(e.clientX - clickStartX);
+        const dy = Math.abs(e.clientY - clickStartY);
+        const dt = Date.now() - clickStartTime;
+        if (dx < TAP_MOVE_LIMIT && dy < TAP_MOVE_LIMIT && dt < 320) {
+          processTapGesture(e.target);
+        }
       }
     });
 
