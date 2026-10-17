@@ -1,14 +1,14 @@
 """
 generate_presentation_deck.py
 Generates a premium, Keynote-compatible 16:9 widescreen presentation deck (PPTX)
-featuring embedded Manim 1080p MP4 clips and matching Apple Pencil annotation slides.
+featuring embedded Manim 1080p MP4 clips and seamless slide transitions.
+Designed for live Apple Keynote presentation on iPad with native Apple PencilKit support.
 """
 
 import os
 from pptx import Presentation
 from pptx.util import Inches, Pt
 from pptx.dml.color import RGBColor
-from pptx.enum.text import PP_ALIGN
 from pptx.enum.shapes import MSO_SHAPE
 
 # Design Tokens (Midnight Navy Theme)
@@ -37,7 +37,6 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         return bg
 
     def add_header(slide, title, category="DIFFERENTIAL CALCULUS // ENGINEERING LECTURE"):
-        # Header banner text box
         tb = slide.shapes.add_textbox(Inches(0.8), Inches(0.4), Inches(11.733), Inches(0.9))
         tf = tb.text_frame
         tf.word_wrap = True
@@ -63,13 +62,68 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         card.line.width = Pt(1.5)
         return card
 
+    def add_video_slide(prs, title, video_path, frame_path, subtitle, prompt_text, notes):
+        s = prs.slides.add_slide(blank_layout)
+        set_slide_background(s)
+        add_header(s, title)
+        
+        # Video Canvas on Left
+        vid_left = Inches(0.8)
+        vid_top = Inches(1.5)
+        vid_w = Inches(7.8)
+        vid_h = Inches(4.387)
+        try:
+            s.shapes.add_movie(video_path, vid_left, vid_top, vid_w, vid_h, poster_frame_image=frame_path, mime_type='video/mp4')
+        except Exception:
+            s.shapes.add_picture(frame_path, vid_left, vid_top, vid_w, vid_h)
+            
+        # Side Teaching Guidance Card
+        side_card = add_card(s, Inches(8.9), Inches(1.5), Inches(3.633), Inches(5.4), border_color=CARD_BORDER)
+        tb_side = s.shapes.add_textbox(Inches(9.1), Inches(1.7), Inches(3.233), Inches(5.0))
+        tf_side = tb_side.text_frame
+        tf_side.word_wrap = True
+        
+        p = tf_side.paragraphs[0]
+        p.text = "KEY TEACHING OBJECTIVE"
+        p.font.size = Pt(11)
+        p.font.bold = True
+        p.font.color.rgb = AMBER
+        
+        p2 = tf_side.add_paragraph()
+        p2.text = subtitle
+        p2.font.size = Pt(14)
+        p2.font.bold = True
+        p2.font.color.rgb = TEXT_WHITE
+        p2.space_before = Pt(8)
+        
+        p3 = tf_side.add_paragraph()
+        p3.text = "LECTURE FOCUS & CUES"
+        p3.font.size = Pt(11)
+        p3.font.bold = True
+        p3.font.color.rgb = CYAN
+        p3.space_before = Pt(16)
+        
+        p4 = tf_side.add_paragraph()
+        p4.text = prompt_text
+        p4.font.size = Pt(12)
+        p4.font.color.rgb = TEXT_MUTED
+        p4.space_before = Pt(8)
+
+        p5 = tf_side.add_paragraph()
+        p5.text = "[Annotate freely in Keynote with Apple Pencil]"
+        p5.font.size = Pt(10)
+        p5.font.color.rgb = TEXT_MUTED
+        p5.space_before = Pt(24)
+
+        s.notes_slide.notes_text_frame.text = notes
+        return s
+
     # -------------------------------------------------------------
     # SLIDE 1: Title Slide
     # -------------------------------------------------------------
     s1 = prs.slides.add_slide(blank_layout)
     set_slide_background(s1)
     
-    # Title Hero Card
     add_card(s1, Inches(1.2), Inches(1.2), Inches(10.933), Inches(5.1), border_color=CYAN)
     tb1 = s1.shapes.add_textbox(Inches(1.8), Inches(1.8), Inches(9.733), Inches(3.9))
     tf1 = tb1.text_frame
@@ -95,7 +149,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     p3.space_before = Pt(14)
 
     p4 = tf1.add_paragraph()
-    p4.text = "Core Function: f(x) = x³ - 3x  |  Engineering Application: Maximum Power Transfer"
+    p4.text = "Core Function: f(x) = x³ - 3x  |  Applied Engineering & Geometric Optimization"
     p4.font.size = Pt(13)
     p4.font.color.rgb = TEXT_MUTED
     p4.space_before = Pt(24)
@@ -118,7 +172,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         ("01", "Visual Motion & Critical Intuition", "Moving tangent vectors, slope zero conditions, and singularities (corners/cusps).", CYAN),
         ("02", "First Derivative Test & Sign Charts", "Factorization morphing, interval sign sampling, and direction transitions.", AMBER),
         ("03", "Second Derivative & Concavity Bending", "Differential curvature f''(x), concavity bowls, and inflection terraces.", CORAL),
-        ("04", "Closed-Interval Engineering Optimization", "Extreme Value Theorem, candidate matrix, and Maximum Power Transfer.", GREEN),
+        ("04", "Applied Engineering Optimization", "Boundary constraints, revenue models, hydraulic channels, and impedance matching.", GREEN),
     ]
     for i, (num, title, desc, accent) in enumerate(modules):
         col_left = Inches(0.8 + i * 2.98)
@@ -147,129 +201,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         p3.space_before = Pt(12)
 
     # -------------------------------------------------------------
-    # Helper to add a Video + Notes Slide
-    # -------------------------------------------------------------
-    def add_video_slide(prs, title, video_path, frame_path, subtitle, prompt_text, notes):
-        s = prs.slides.add_slide(blank_layout)
-        set_slide_background(s)
-        add_header(s, title)
-        
-        # Video on Left
-        vid_left = Inches(0.8)
-        vid_top = Inches(1.5)
-        vid_w = Inches(7.8)
-        vid_h = Inches(4.387)
-        # Borderless seamless video embedding
-        try:
-            s.shapes.add_movie(video_path, vid_left, vid_top, vid_w, vid_h, poster_frame_image=frame_path, mime_type='video/mp4')
-        except Exception:
-            # Fallback to poster frame
-            s.shapes.add_picture(frame_path, vid_left, vid_top, vid_w, vid_h)
-            
-        # Side Teaching Guidance Card
-        side_card = add_card(s, Inches(8.9), Inches(1.5), Inches(3.633), Inches(5.4), border_color=CARD_BORDER)
-        tb_side = s.shapes.add_textbox(Inches(9.1), Inches(1.7), Inches(3.233), Inches(5.0))
-        tf_side = tb_side.text_frame
-        tf_side.word_wrap = True
-        
-        p = tf_side.paragraphs[0]
-        p.text = "KEY TEACHING OBJECTIVE"
-        p.font.size = Pt(11)
-        p.font.bold = True
-        p.font.color.rgb = AMBER
-        
-        p2 = tf_side.add_paragraph()
-        p2.text = subtitle
-        p2.font.size = Pt(14)
-        p2.font.bold = True
-        p2.font.color.rgb = TEXT_WHITE
-        p2.space_before = Pt(8)
-        
-        p3 = tf_side.add_paragraph()
-        p3.text = "LECTURE PROMPT & PAUSE CUE"
-        p3.font.size = Pt(11)
-        p3.font.bold = True
-        p3.font.color.rgb = CYAN
-        p3.space_before = Pt(16)
-        
-        p4 = tf_side.add_paragraph()
-        p4.text = prompt_text
-        p4.font.size = Pt(12)
-        p4.font.color.rgb = TEXT_MUTED
-        p4.space_before = Pt(8)
-
-        # Bottom play hint
-        p5 = tf_side.add_paragraph()
-        p5.text = "[Tap video to play animation on iPad]"
-        p5.font.size = Pt(10)
-        p5.font.color.rgb = TEXT_MUTED
-        p5.space_before = Pt(24)
-
-        s.notes_slide.notes_text_frame.text = notes
-        return s
-
-    # Helper to add an Apple Pencil Annotation Slide
-    def add_annotation_slide(prs, title, frame_path, exercise_title, instructions, pencil_prompts, notes):
-        s = prs.slides.add_slide(blank_layout)
-        set_slide_background(s)
-        add_header(s, title, category="LIVE ANNOTATION WORKSPACE // APPLE PENCIL INTERACTION")
-        
-        # Left side: Reference visual frame
-        f_left = Inches(0.8)
-        f_top = Inches(1.5)
-        f_w = Inches(6.0)
-        f_h = Inches(3.375)
-        add_card(s, f_left - Inches(0.05), f_top - Inches(0.05), f_w + Inches(0.1), f_h + Inches(0.1), border_color=AMBER)
-        s.shapes.add_picture(frame_path, f_left, f_top, f_w, f_h)
-        
-        # Under image: key formula/summary card
-        bot_card = add_card(s, Inches(0.8), Inches(5.1), Inches(6.0), Inches(1.8), border_color=CARD_BORDER)
-        tb_bot = s.shapes.add_textbox(Inches(1.0), Inches(5.2), Inches(5.6), Inches(1.6))
-        tf_bot = tb_bot.text_frame
-        tf_bot.word_wrap = True
-        p = tf_bot.paragraphs[0]
-        p.text = "ANALYTIC FORMULATION & CHECKLIST"
-        p.font.size = Pt(10)
-        p.font.bold = True
-        p.font.color.rgb = CYAN
-        for inst in instructions:
-            pi = tf_bot.add_paragraph()
-            pi.text = "• " + inst
-            pi.font.size = Pt(11)
-            pi.font.color.rgb = TEXT_WHITE
-            pi.space_before = Pt(4)
-
-        # Right side: Full Live Apple Pencil Derivation Canvas Box
-        c_right = add_card(s, Inches(7.1), Inches(1.5), Inches(5.433), Inches(5.4), border_color=CYAN, bg_color=RGBColor(15, 23, 42))
-        tb_c = s.shapes.add_textbox(Inches(7.3), Inches(1.7), Inches(5.033), Inches(5.0))
-        tf_c = tb_c.text_frame
-        tf_c.word_wrap = True
-        
-        p = tf_c.paragraphs[0]
-        p.text = "APPLE PENCIL SCRATCHPAD: " + exercise_title.upper()
-        p.font.size = Pt(11)
-        p.font.bold = True
-        p.font.color.rgb = CYAN
-        
-        p2 = tf_c.add_paragraph()
-        p2.text = "Live Student Derivation Prompts:"
-        p2.font.size = Pt(13)
-        p2.font.bold = True
-        p2.font.color.rgb = TEXT_WHITE
-        p2.space_before = Pt(8)
-        
-        for prompt in pencil_prompts:
-            pp = tf_c.add_paragraph()
-            pp.text = "✍️ " + prompt
-            pp.font.size = Pt(12)
-            pp.font.color.rgb = TEXT_MUTED
-            pp.space_before = Pt(12)
-
-        s.notes_slide.notes_text_frame.text = notes
-        return s
-
-    # -------------------------------------------------------------
-    # SLIDE 3: Scene 01 Video - Hook Hill
+    # SLIDE 3: Terrain Exploration Hook
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -282,29 +214,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 4: Scene 01 Annotation - Slope Intuition
-    # -------------------------------------------------------------
-    add_annotation_slide(
-        prs,
-        title="Live Annotation: Direction of Motion & Tangent Equilibrium",
-        frame_path="media/frames/Scene01_HookHill_frame.png",
-        exercise_title="Terrain Tangent Incline",
-        instructions=[
-            "Increasing interval: Rate of climb f'(x) > 0",
-            "Peak crest: Instantaneous horizontal leveling f'(x) = 0",
-            "Decreasing interval: Rate of descent f'(x) < 0",
-            "Valley floor: Leveling out before re-ascent f'(x) = 0"
-        ],
-        pencil_prompts=[
-            "Draw tangent lines with Apple Pencil at x = -2.5, x = -1.2, x = 0, and x = 1.8.",
-            "Write the algebraic inequality for slope: m > 0 vs. m = 0 vs. m < 0.",
-            "Circle the global highest point vs local sub-crest."
-        ],
-        notes="Engage students by sketching tangent arrows live. Emphasize that zero slope is the boundary marker between climbing and falling."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 5: Scene 02 Video - Local vs Absolute
+    # SLIDE 4: Local vs Absolute Extrema
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -317,46 +227,11 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 6: Scene 02 Annotation - Boundary Extrema
-    # -------------------------------------------------------------
-    add_annotation_slide(
-        prs,
-        title="Live Annotation: The Neighborhood Test & Boundary Caps",
-        frame_path="media/frames/Scene02_LocalVsAbsolute_frame.png",
-        exercise_title="Neighborhood Verification",
-        instructions=[
-            "Local Max: f(c) >= f(x) for all x in (c - delta, c + delta)",
-            "Boundary points on [a, b] cannot contain two-sided open intervals!",
-            "Therefore: Boundary endpoints CANNOT be Local Extrema (by standard definition).",
-            "Endpoints CAN and frequently DO serve as Absolute Extrema!"
-        ],
-        pencil_prompts=[
-            "Draw an open interval (c - δ, c + δ) around the local peak.",
-            "Show why the endpoint x = b cannot fit a two-sided ball.",
-            "Annotate why the right boundary is the Global Maximum."
-        ],
-        notes="This distinction prevents severe exam errors. Reinforce that local extrema are interior phenomena."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 7: MASTER SEQUENCE (THE FULL CONTINUOUS 3BLUE1BROWN MOVIE)
+    # SLIDE 5: The Cubic Landscape f(x) = x³ - 3x
     # -------------------------------------------------------------
     add_video_slide(
         prs,
-        title="🌟 Unified Master Sequence: The Cubic Manifold",
-        video_path="media/videos/clips/SignatureSequenceMaster.mp4",
-        frame_path="media/frames/SignatureSequenceMaster_frame.png",
-        subtitle="Continuous 3Blue1Brown Kinematic Derivation of f(x) = x³ - 3x",
-        prompt_text="Watch the complete sequence flow: curve creation, dynamic rotating slope tangent, equation morphing 3x² - 3 -> 3(x-1)(x+1) = 0, and concavity verification.",
-        notes="Play the continuous master animation. Tap video to pause and discuss any intermediate step with Apple Pencil."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 8: Signature Scene 1 Video - The Cubic Curve
-    # -------------------------------------------------------------
-    add_video_slide(
-        prs,
-        title="Signature Function: f(x) = x³ - 3x Trajectory",
+        title="The Cubic Landscape: Trajectory of f(x) = x³ - 3x",
         video_path="media/videos/clips/SignatureScene1_TheFunction.mp4",
         frame_path="media/frames/SignatureScene1_TheFunction_frame.png",
         subtitle="Tracking the Coordinate State of an Odd Cubic Curve",
@@ -365,42 +240,20 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 8: Signature Scene 2 Video - The Dynamic Tangent
+    # SLIDE 6: Dynamic Tangent Telemetry & Derivative f'(x)
     # -------------------------------------------------------------
     add_video_slide(
         prs,
-        title="Kinetic Tangent: Dynamic Slope Telemetry",
+        title="Dynamic Tangent Telemetry & Derivative f'(x)",
         video_path="media/videos/clips/SignatureScene2_TheTangent.mp4",
         frame_path="media/frames/SignatureScene2_TheTangent_frame.png",
-        subtitle="Visualizing the Derivative as an Instantaneous Vector",
+        subtitle="Visualizing the Derivative as an Instantaneous Rotating Vector",
         prompt_text="Notice the real-time slope readout: as the point passes x = -1, the slope m collapses precisely from positive to zero to negative.",
         notes="Play the clip. Point out the color change of the tangent line: Cyan (positive slope) to Amber (zero slope) to Coral (negative slope)."
     )
 
     # -------------------------------------------------------------
-    # SLIDE 9: Signature Scene 2 Annotation - Tangent Slope Derivation
-    # -------------------------------------------------------------
-    add_annotation_slide(
-        prs,
-        title="Live Annotation: Instantaneous Slope Derivation",
-        frame_path="media/frames/SignatureScene2_TheTangent_frame.png",
-        exercise_title="Differentiation from First Principles",
-        instructions=[
-            "Given: f(x) = x³ - 3x",
-            "Derivative: f'(x) = d/dx [x³ - 3x] = 3x² - 3",
-            "At x = -1: f'(-1) = 3(-1)² - 3 = 0  (Horizontal)",
-            "At x = 0:  f'(0)  = 3(0)² - 3 = -3  (Steepest descent)"
-        ],
-        pencil_prompts=[
-            "Derive f'(x) step-by-step using the Power Rule.",
-            "Calculate f'(0) live and write why this represents maximum descent rate.",
-            "Calculate f'(1) and verify the second horizontal tangent."
-        ],
-        notes="Guide the students through applying the power rule live. Write down the derivative in the scratchpad."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 10: Scene 03 Video - Singularities DNE
+    # SLIDE 7: Singularities (Corners & Cusps)
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -413,29 +266,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 11: Scene 03 Annotation - Non-Differentiable Extrema
-    # -------------------------------------------------------------
-    add_annotation_slide(
-        prs,
-        title="Live Annotation: Left vs. Right Difference Quotients",
-        frame_path="media/frames/Scene03_SingularitiesDNE_frame.png",
-        exercise_title="Singularity Limit Analysis",
-        instructions=[
-            "Absolute Value f(x) = |x| at x = 0: lim(x->0-) = -1 != lim(x->0+) = +1",
-            "Power Function f(x) = x^(2/3): f'(x) = (2/3)x^(-1/3) = 2/(3 * x^(1/3))",
-            "As x -> 0, f'(x) -> ±∞ (Vertical Tangent / Cusp)",
-            "Both functions reach a valid, indisputable Global Minimum at (0, 0)!"
-        ],
-        pencil_prompts=[
-            "Compute lim_{h->0-} and lim_{h->0+} for |h|/h live.",
-            "Write the formal two-part definition of Critical Number c: (1) f'(c)=0 OR (2) f'(c) DNE, with c in Domain.",
-            "Highlight common student trap: 'Assuming critical points only come from setting derivative equal to 0'."
-        ],
-        notes="Crucial misconception buster: many students forget to test points where denominator of f'(x) is zero."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 12: Signature Scene 7 Video - Counterexample g(x)=x^3
+    # SLIDE 8: The Critical Point Trap - Inflection Terraces
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -448,33 +279,11 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 13: Signature Scene 7 Annotation - Terrace Logic
-    # -------------------------------------------------------------
-    add_annotation_slide(
-        prs,
-        title="Live Annotation: Inflection Terraces & Necessary vs. Sufficient",
-        frame_path="media/frames/SignatureScene7_Counterexample_frame.png",
-        exercise_title="Logical Counterexample Proof",
-        instructions=[
-            "Theorem (Fermat's): If f has a local extremum at c and f'(c) exists, then f'(c) = 0.",
-            "Converse: 'If f'(c) = 0, then f has an extremum at c' is FALSE!",
-            "For g(x) = x³: g'(x) = 3x² >= 0 for all x.",
-            "Sign test: (+) before 0, and (+) after 0. No sign reversal!"
-        ],
-        pencil_prompts=[
-            "Write the logic implication: Extremum => f'(c)=0 (True), f'(c)=0 => Extremum (False).",
-            "Sketch the sign line for 3x² showing (+) -> (0) -> (+).",
-            "Define 'Stationary Inflection Point' (Horizontal inflection point)."
-        ],
-        notes="Draw attention to logic arrows: P => Q does not mean Q => P. This is tested on every university exam."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 14: Signature Scene 3 Video - Equation Morphing
+    # SLIDE 9: Algebraic Factoring of the Derivative
     # -------------------------------------------------------------
     add_video_slide(
         prs,
-        title="Algebraic Morphing: Factoring the Derivative",
+        title="Algebraic Factoring: Zeroes of the Derivative",
         video_path="media/videos/clips/SignatureScene3_EquationMorph.mp4",
         frame_path="media/frames/SignatureScene3_EquationMorph_frame.png",
         subtitle="3x² - 3  ==>  3(x² - 1)  ==>  3(x - 1)(x + 1) = 0",
@@ -483,7 +292,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 15: Signature Scene 4 Video - First Derivative Test
+    # SLIDE 10: First Derivative Test & Sign Partitioning
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -496,29 +305,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 16: Signature Scene 4 Annotation - Sign Chart Construction
-    # -------------------------------------------------------------
-    add_annotation_slide(
-        prs,
-        title="Live Annotation: First Derivative Sign Chart Matrix",
-        frame_path="media/frames/SignatureScene4_DerivativeTest_frame.png",
-        exercise_title="Interval Test Table",
-        instructions=[
-            "Interval 1: (-inf, -1) -> Test x = -2: f'(-2) = 3(-2)² - 3 = +9 > 0 (INC)",
-            "Interval 2: (-1, 1)    -> Test x = 0:  f'(0) = 3(0)² - 3 = -3 < 0   (DEC)",
-            "Interval 3: (1, inf)   -> Test x = +2: f'(+2) = 3(2)² - 3 = +9 > 0  (INC)",
-            "Conclusion: (+ to -) traps a LOCAL MAX; (- to +) holds a LOCAL MIN."
-        ],
-        pencil_prompts=[
-            "Draw the 3-row sign chart table with Apple Pencil.",
-            "Fill in test values and show factor signs: (x-1) and (x+1).",
-            "Draw the physical climbing/falling arrows: ↗ ↘ ↗."
-        ],
-        notes="Show students the factored testing method: instead of computing 3x^2-3, check signs of 3*(x-1)*(x+1) directly."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 17: Signature Scene 5 Video & Slide - Exact Extrema
+    # SLIDE 11: Exact Coordinate Verification
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -531,7 +318,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 18: Signature Scene 6 Video - Second Derivative & Concavity
+    # SLIDE 12: Second Derivative & Concavity Bending
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -544,15 +331,15 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 19: Test Comparison & Decision Matrix
+    # SLIDE 13: Test Comparison & Decision Matrix
     # -------------------------------------------------------------
-    s19 = prs.slides.add_slide(blank_layout)
-    set_slide_background(s19)
-    add_header(s19, "Extrema Decision Matrix: 1st vs. 2nd Derivative Test", category="THEORETICAL COMPARISON // EXAM STRATEGY")
+    s13 = prs.slides.add_slide(blank_layout)
+    set_slide_background(s13)
+    add_header(s13, "Extrema Decision Matrix: 1st vs. 2nd Derivative Test", category="THEORETICAL COMPARISON // EXAM STRATEGY")
     
     # Left Card: 1st Derivative Test
-    c_left = add_card(s19, Inches(0.8), Inches(1.5), Inches(5.6), Inches(5.4), border_color=CYAN)
-    tb_l = s19.shapes.add_textbox(Inches(1.0), Inches(1.7), Inches(5.2), Inches(5.0))
+    c_left = add_card(s13, Inches(0.8), Inches(1.5), Inches(5.6), Inches(5.4), border_color=CYAN)
+    tb_l = s13.shapes.add_textbox(Inches(1.0), Inches(1.7), Inches(5.2), Inches(5.0))
     tf_l = tb_l.text_frame
     tf_l.word_wrap = True
     p = tf_l.paragraphs[0]
@@ -581,8 +368,8 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         p2.font.color.rgb = TEXT_WHITE
 
     # Right Card: 2nd Derivative Test
-    c_right = add_card(s19, Inches(6.9), Inches(1.5), Inches(5.6), Inches(5.4), border_color=AMBER)
-    tb_r = s19.shapes.add_textbox(Inches(7.1), Inches(1.7), Inches(5.2), Inches(5.0))
+    c_right = add_card(s13, Inches(6.9), Inches(1.5), Inches(5.6), Inches(5.4), border_color=AMBER)
+    tb_r = s13.shapes.add_textbox(Inches(7.1), Inches(1.7), Inches(5.2), Inches(5.0))
     tf_r = tb_r.text_frame
     tf_r.word_wrap = True
     p = tf_r.paragraphs[0]
@@ -610,7 +397,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         p2.font.size = Pt(11)
         p2.font.color.rgb = TEXT_WHITE
 
-    s19.notes_slide.notes_text_frame.text = (
+    s13.notes_slide.notes_text_frame.text = (
         "LECTURE EMPHASIS:\n"
         "Stress the 'Inconclusive' case: for f(x)=x^4, f''(0)=0 and it has a min.\n"
         "For f(x)=-x^4, f''(0)=0 and it has a max. For f(x)=x^3, f''(0)=0 and it has neither!\n"
@@ -618,7 +405,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 20: Scene 04 Video - Closed Interval Method
+    # SLIDE 14: Closed Interval Method (EVT)
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -631,7 +418,7 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 21: Scene 05 Video - Engineering Optimization
+    # SLIDE 15: Maximum Power Transfer Theorem
     # -------------------------------------------------------------
     add_video_slide(
         prs,
@@ -644,15 +431,79 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
     )
 
     # -------------------------------------------------------------
-    # SLIDE 22: Practice Problem & Exit Ticket
+    # SLIDE 16: Optimization 1 - Number Exceeding its Square
     # -------------------------------------------------------------
-    s22 = prs.slides.add_slide(blank_layout)
-    set_slide_background(s22)
-    add_header(s22, "Engineering Practice Challenge & Exit Ticket", category="STUDENT ACTIVE LEARNING // LIVE DERIVATION")
+    add_video_slide(
+        prs,
+        title="Optimization 1: Number Exceeding its Square",
+        video_path="media/videos/clips/MathalinoProblem1_NumberOptimization.mp4",
+        frame_path="media/frames/MathalinoProblem1_NumberOptimization_frame.png",
+        subtitle="What number exceeds its square by the maximum amount?",
+        prompt_text="Objective f(x) = x - x². Differentiating f'(x) = 1 - 2x = 0 yields critical number x = 1/2. Concavity f''(x) = -2 < 0 proves strict global maximum of 1/4.",
+        notes="Emphasize translating verbal problem statements into analytical mathematical functions, followed by first and second derivative verification."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 17: Optimization 2 - Riverbank Fencing Design
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Optimization 2: Riverbank Fencing & Boundary Constraints",
+        video_path="media/videos/clips/MathalinoProblem2_RiverbankLot.mp4",
+        frame_path="media/frames/MathalinoProblem2_RiverbankLot_frame.png",
+        subtitle="Least fencing perimeter for fixed area A along a straight river",
+        prompt_text="Area A = xy reduces perimeter P = x + 2y to single variable P(y) = A/y + 2y. Differentiating: dP/dy = -A/y² + 2 = 0 => 2y² = A = xy => Width y = x/2.",
+        notes="Geometric constraint reduces multivariable to single variable. With 1 natural boundary (river), optimal ratio is width = half length."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 18: Optimization 3 - Open-Top Box Volume Maximization
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Optimization 3: Open-Top Box Volume Maximization",
+        video_path="media/videos/clips/MathalinoProblem3_OpenTopBox.mp4",
+        frame_path="media/frames/MathalinoProblem3_OpenTopBox_frame.png",
+        subtitle="15\" × 24\" Cardboard Sheet: Cut squares x to maximize Volume",
+        prompt_text="V(x) = (24-2x)(15-2x)x = 4x³ - 78x² + 360x. Setting V'(x) = 0 yields x = 3 or x = 10. Feasible physical domain (0, 7.5) eliminates x = 10! V_max = 486 in³.",
+        notes="Critical points must be tested against physical boundaries. x=10 is extraneous because 15-2(10) < 0."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 19: Optimization 4 - Tour Bus Maximum Revenue
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Optimization 4: Tour Bus Yield Management & Revenue",
+        video_path="media/videos/clips/MathalinoProblem4_TourBusRevenue.mp4",
+        frame_path="media/frames/MathalinoProblem4_TourBusRevenue_frame.png",
+        subtitle="80-Seat Tour Bus: Balancing ticket price vs. passenger demand",
+        prompt_text="Base fare: P350/seat. Increments: P12.50/seat with -2 passengers. R(x) = (350 + 12.5x)(80 - 2x) = 28,000 + 300x - 25x². dR/dx = 0 => x = 6. Fare = P425, Revenue = P28,900.",
+        notes="Real-world business revenue optimization. Calculus discovers the pricing sweet spot between seat price and passenger occupancy."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 20: Optimization 5 - Trapezoidal Gutter Capacity
+    # -------------------------------------------------------------
+    add_video_slide(
+        prs,
+        title="Optimization 5: Trapezoidal Gutter Hydraulic Capacity",
+        video_path="media/videos/clips/MathalinoProblem5_TrapezoidalGutter.mp4",
+        frame_path="media/frames/MathalinoProblem5_TrapezoidalGutter_frame.png",
+        subtitle="14-inch metal strip bent at 45°: Maximizing hydraulic carrying capacity",
+        prompt_text="Base a, sides s = (14-a)/2, height h = (14-a)/(2√2). Cross-section Area A = ah + h². Setting dA/da = 0 yields optimal base width a = 14(√2 - 1)/(2√2 - 1) ≈ 3.17 inches (slants s ≈ 5.41 inches).",
+        notes="Advanced civil and mechanical engineering channel design. Exact radical algebra simplified to decimal dimensions."
+    )
+
+    # -------------------------------------------------------------
+    # SLIDE 21: Engineering Practice Challenge & Exit Ticket
+    # -------------------------------------------------------------
+    s21 = prs.slides.add_slide(blank_layout)
+    set_slide_background(s21)
+    add_header(s21, "Engineering Practice Challenge & Exit Ticket", category="STUDENT ACTIVE LEARNING // CONCEPT APPLICATION")
     
-    # Left Card: Problem Statement
-    c_prob = add_card(s22, Inches(0.8), Inches(1.5), Inches(5.8), Inches(5.4), border_color=AMBER)
-    tb_pr = s22.shapes.add_textbox(Inches(1.0), Inches(1.7), Inches(5.4), Inches(5.0))
+    c_prob = add_card(s21, Inches(0.8), Inches(1.5), Inches(5.8), Inches(5.4), border_color=AMBER)
+    tb_pr = s21.shapes.add_textbox(Inches(1.0), Inches(1.7), Inches(5.4), Inches(5.0))
     tf_pr = tb_pr.text_frame
     tf_pr.word_wrap = True
     p = tf_pr.paragraphs[0]
@@ -688,9 +539,9 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         ps.font.color.rgb = TEXT_MUTED
         ps.space_before = Pt(6)
 
-    # Right Card: Progressive Solution Key (for Instructor or Reveal)
-    c_sol = add_card(s22, Inches(6.9), Inches(1.5), Inches(5.633), Inches(5.4), border_color=CYAN)
-    tb_s = s22.shapes.add_textbox(Inches(7.1), Inches(1.7), Inches(5.233), Inches(5.0))
+    # Right Card: Progressive Solution Key
+    c_sol = add_card(s21, Inches(6.9), Inches(1.5), Inches(5.633), Inches(5.4), border_color=CYAN)
+    tb_s = s21.shapes.add_textbox(Inches(7.1), Inches(1.7), Inches(5.233), Inches(5.0))
     tf_s = tb_s.text_frame
     tf_s.word_wrap = True
     p = tf_s.paragraphs[0]
@@ -720,186 +571,87 @@ def create_deck(output_pptx="presentation/maxima_minima_lecture.pptx"):
         pv.font.size = Pt(11)
         pv.font.color.rgb = TEXT_WHITE
 
-    s22.notes_slide.notes_text_frame.text = (
+    s21.notes_slide.notes_text_frame.text = (
         "INSTRUCTOR WRAP-UP & EXIT TICKET:\n"
-        "Give students 4 minutes to work. Walk the room or display Apple Pencil annotations.\n"
+        "Give students 4 minutes to work. Walk the room or annotate with Apple Pencil.\n"
         "Reveal the key insight: The local max (-1, 12) is soundly beaten by the endpoint (4, 37)!\n"
         "Remind students: Never neglect endpoints in engineering optimization."
     )
 
     # -------------------------------------------------------------
-    # SLIDE 23: Mathalino Problem 1 - Number Optimization Video
+    # SLIDE 22: References & Academic Acknowledgements
     # -------------------------------------------------------------
-    add_video_slide(
-        prs,
-        title="Mathalino Prob 1: Number Exceeding its Square",
-        video_path="media/videos/clips/MathalinoProblem1_NumberOptimization.mp4",
-        frame_path="media/frames/MathalinoProblem1_NumberOptimization_frame.png",
-        subtitle="What number exceeds its square by the maximum amount? (Source: mathalino.com)",
-        prompt_text="Objective f(x) = x - x². Differentiating f'(x) = 1 - 2x = 0 yields critical number x = 1/2. Concavity f''(x) = -2 < 0 proves strict global maximum of 1/4.",
-        notes="Mathalino Prob 1. Source: mathalino.com/reviewer/differential-calculus/01-04-number-problems-in-maxima-and-minima. Emphasize model definition, derivative test, and concavity."
-    )
+    s22 = prs.slides.add_slide(blank_layout)
+    set_slide_background(s22)
+    add_header(s22, "Curriculum References & Academic Acknowledgements", category="BIBLIOGRAPHY // PROBLEM SOURCES")
+    
+    # Left Card: Primary Applied Problem Source - Mathalino
+    c_ref_l = add_card(s22, Inches(0.8), Inches(1.5), Inches(5.8), Inches(5.4), border_color=AMBER)
+    tb_rl = s22.shapes.add_textbox(Inches(1.0), Inches(1.7), Inches(5.4), Inches(5.0))
+    tf_rl = tb_rl.text_frame
+    tf_rl.word_wrap = True
+    
+    p = tf_rl.paragraphs[0]
+    p.text = "PRIMARY APPLIED PROBLEM SOURCE: MATHALINO"
+    p.font.size = Pt(13)
+    p.font.bold = True
+    p.font.color.rgb = AMBER
+    
+    p_desc = tf_rl.add_paragraph()
+    p_desc.text = "The optimization case studies in this lecture are curated from the comprehensive engineering mathematics reviewer at Mathalino (mathalino.com):"
+    p_desc.font.size = Pt(11)
+    p_desc.font.color.rgb = TEXT_MUTED
+    p_desc.space_before = Pt(8)
+    
+    refs = [
+        ("Problem 1: Number Exceeding Square", "https://mathalino.com/reviewer/differential-calculus/01-04-number-problems-in-maxima-and-minima"),
+        ("Problem 10: Riverbank Fencing Lot", "https://mathalino.com/reviewer/differential-calculus/09-11-rectangular-lot-problems-in-maxima-and-minima"),
+        ("Problem 16: Open-Top 15\"x24\" Box", "https://mathalino.com/reviewer/differential-calculus/15-17-box-open-at-the-top"),
+        ("Problem 03: 80-Seat Tour Bus Revenue", "https://mathalino.com/reviewer/differential-calculus/03-maximum-revenue-tour-bus-80-seats"),
+        ("Problem 42: Trapezoidal Gutter 14\" Strip", "https://mathalino.com/reviewer/differential-calculus/41-42-maxima-and-minima-problem-involving-a-trapezoidal-gutter"),
+    ]
+    for title, url in refs:
+        p_t = tf_rl.add_paragraph()
+        p_t.text = "• " + title
+        p_t.font.size = Pt(11)
+        p_t.font.bold = True
+        p_t.font.color.rgb = CYAN
+        p_t.space_before = Pt(8)
+        p_u = tf_rl.add_paragraph()
+        p_u.text = "   " + url
+        p_u.font.size = Pt(9.5)
+        p_u.font.color.rgb = TEXT_MUTED
 
-    # SLIDE 24: Mathalino Problem 1 - Annotation Workspace
-    add_annotation_slide(
-        prs,
-        title="Mathalino Prob 1: Modeling & Solution Workspace",
-        frame_path="media/frames/MathalinoProblem1_NumberOptimization_frame.png",
-        exercise_title="Number Optimization (Mathalino 01)",
-        instructions=[
-            "Define variable x as the unknown number.",
-            "Formulate objective function: f(x) = x - x².",
-            "Differentiate and find critical number: f'(x) = 1 - 2x = 0 => x = 1/2.",
-            "Verify with 2nd derivative: f''(1/2) = -2 < 0 (Maximum).",
-            "Calculate maximum excess value: f(1/2) = 1/4."
-        ],
-        pencil_prompts=[
-            "✍️ Write out the objective function f(x) and its derivative f'(x).",
-            "✍️ Solve for critical number and compute second derivative f''(x).",
-            "✍️ State final conclusion: number is 1/2, maximum excess is 1/4."
-        ],
-        notes="Instructor Guidance: Walk students through translating English problem statement into calculus objective function."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 25: Mathalino Problem 10 - Riverbank Fencing Video
-    # -------------------------------------------------------------
-    add_video_slide(
-        prs,
-        title="Mathalino Prob 10: Riverbank Fencing Optimization",
-        video_path="media/videos/clips/MathalinoProblem2_RiverbankLot.mp4",
-        frame_path="media/frames/MathalinoProblem2_RiverbankLot_frame.png",
-        subtitle="Least fencing perimeter for fixed area A along a riverbank (Source: mathalino.com)",
-        prompt_text="Area A = xy reduces perimeter P = x + 2y to single variable P(y) = A/y + 2y. Differentiating: dP/dy = -A/y² + 2 = 0 => 2y² = A = xy => Width y = x/2.",
-        notes="Mathalino Prob 10. Source: mathalino.com/reviewer/differential-calculus/09-11-rectangular-lot-problems-in-maxima-and-minima. Geometric constraint reduces multivariable to single variable. Optimal shape: width is half length."
-    )
-
-    # SLIDE 26: Mathalino Problem 10 - Annotation Workspace
-    add_annotation_slide(
-        prs,
-        title="Mathalino Prob 10: Fencing Constraint Workspace",
-        frame_path="media/frames/MathalinoProblem2_RiverbankLot_frame.png",
-        exercise_title="Riverbank Fencing (Mathalino 10)",
-        instructions=[
-            "Identify given constraint: Constant Area A = xy.",
-            "Express objective fence length: P = x + 2y (no fence along river).",
-            "Substitute x = A/y to obtain single-variable function P(y).",
-            "Differentiate dP/dy = -A/y² + 2 = 0 => 2y² = A.",
-            "Substitute A = xy: 2y² = xy => y = (1/2)x (width is half length)."
-        ],
-        pencil_prompts=[
-            "✍️ Sketch the riverbank and the 3-sided fence.",
-            "✍️ Substitute constraint x = A/y into P = x + 2y.",
-            "✍️ Differentiate and prove that optimal width y = (1/2)x."
-        ],
-        notes="Instructor Guidance: Contrast 3-sided fence (y = x/2) with traditional 4-sided enclosure (square x = y)."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 27: Mathalino Problem 16 - Open-Top Box Video
-    # -------------------------------------------------------------
-    add_video_slide(
-        prs,
-        title="Mathalino Prob 16: Open-Top Box Optimization",
-        video_path="media/videos/clips/MathalinoProblem3_OpenTopBox.mp4",
-        frame_path="media/frames/MathalinoProblem3_OpenTopBox_frame.png",
-        subtitle="15\" × 24\" Cardboard Sheet: Cut squares x to maximize Volume (Source: mathalino.com)",
-        prompt_text="V(x) = (24-2x)(15-2x)x = 4x³ - 78x² + 360x. Setting V'(x) = 0 yields x = 3 or x = 10. Feasible physical domain (0, 7.5) eliminates x = 10! V_max = 486 in³.",
-        notes="Mathalino Prob 16. Source: mathalino.com/reviewer/differential-calculus/15-17-box-open-at-the-top. Critical points must be tested against physical boundaries. x=10 is extraneous because 15-2(10) < 0."
-    )
-
-    # SLIDE 28: Mathalino Problem 16 - Annotation Workspace
-    add_annotation_slide(
-        prs,
-        title="Mathalino Prob 16: Domain Feasibility & Volume Workspace",
-        frame_path="media/frames/MathalinoProblem3_OpenTopBox_frame.png",
-        exercise_title="Open-Top Box Optimization (Mathalino 16)",
-        instructions=[
-            "Cardboard dimensions: 24'' by 15''. Corner cutout: x by x.",
-            "Folded dimensions: Length = 24 - 2x, Width = 15 - 2x, Height = x.",
-            "Objective: V(x) = 4x³ - 78x² + 360x.",
-            "Differentiate: V'(x) = 12(x² - 13x + 30) = 12(x - 3)(x - 10) = 0.",
-            "Physical domain check: 0 < x < 7.5''. Reject x = 10''.",
-            "Optimal cut x = 3''. V_max = (18)(9)(3) = 486 in³."
-        ],
-        pencil_prompts=[
-            "✍️ Write dimensions of folded box in terms of x.",
-            "✍️ Factor V'(x) = 0 and solve for critical numbers x = 3, 10.",
-            "✍️ Disqualify x = 10 using width constraint 15 - 2x > 0.",
-            "✍️ Compute maximum volume V(3) = 486 in³."
-        ],
-        notes="Instructor Guidance: Emphasize why domain inspection is mandatory in engineering optimization."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 29: Mathalino Problem 03 - Tour Bus Revenue Video
-    # -------------------------------------------------------------
-    add_video_slide(
-        prs,
-        title="Mathalino Prob 03: Tour Bus Maximum Revenue",
-        video_path="media/videos/clips/MathalinoProblem4_TourBusRevenue.mp4",
-        frame_path="media/frames/MathalinoProblem4_TourBusRevenue_frame.png",
-        subtitle="80-Seat Tour Bus: Balancing ticket price vs. demand drop (Source: mathalino.com)",
-        prompt_text="Base fare: P350/seat. Increments: P12.50/seat with -2 passengers. R(x) = (350 + 12.5x)(80 - 2x) = 28,000 + 300x - 25x². dR/dx = 0 => x = 6. Fare = P425, Revenue = P28,900 [Option C].",
-        notes="Mathalino Prob 03. Source: mathalino.com/reviewer/differential-calculus/03-maximum-revenue-tour-bus-80-seats. Real-world business revenue optimization. Matches Option C on Mathalino reviewer."
-    )
-
-    # SLIDE 30: Mathalino Problem 03 - Annotation Workspace
-    add_annotation_slide(
-        prs,
-        title="Mathalino Prob 03: Revenue Model Workspace",
-        frame_path="media/frames/MathalinoProblem4_TourBusRevenue_frame.png",
-        exercise_title="Tour Bus Revenue (Mathalino 03)",
-        instructions=[
-            "Base fare: P28,000 / 80 seats = P350 per passenger.",
-            "Increment per seat: P1,000 / 80 = P12.50 per passenger.",
-            "Let x = number of P1,000 package increments.",
-            "Price p(x) = 350 + 12.5x; Demand q(x) = 80 - 2x.",
-            "R(x) = 28,000 + 300x - 25x² => dR/dx = 300 - 50x = 0 => x = 6.",
-            "Optimal Fare: P425/seat; Passengers: 68; Max Revenue: P28,900."
-        ],
-        pencil_prompts=[
-            "✍️ Formulate price p(x) and quantity q(x) expressions.",
-            "✍️ Multiply to construct R(x) and differentiate dR/dx = 0.",
-            "✍️ Solve for x = 6 and evaluate optimal fare P425 and revenue P28,900."
-        ],
-        notes="Instructor Guidance: Show how calculus balances price elasticity against volume."
-    )
-
-    # -------------------------------------------------------------
-    # SLIDE 31: Mathalino Problem 42 - Trapezoidal Gutter Video
-    # -------------------------------------------------------------
-    add_video_slide(
-        prs,
-        title="Mathalino Prob 42: Trapezoidal Gutter Capacity",
-        video_path="media/videos/clips/MathalinoProblem5_TrapezoidalGutter.mp4",
-        frame_path="media/frames/MathalinoProblem5_TrapezoidalGutter_frame.png",
-        subtitle="14-inch metal strip bent at 45°: Maximizing hydraulic carrying capacity (Source: mathalino.com)",
-        prompt_text="Base a, sides s = (14-a)/2, height h = (14-a)/(2√2). Cross-section Area A = ah + h². Setting dA/da = 0 yields optimal base width a = 14(√2 - 1)/(2√2 - 1) ≈ 3.17 inches (slants s ≈ 5.41 inches).",
-        notes="Mathalino Prob 42. Source: mathalino.com/reviewer/differential-calculus/41-42-maxima-and-minima-problem-involving-a-trapezoidal-gutter. Advanced engineering civil/mechanical optimization. Exact radical algebra simplified to decimal."
-    )
-
-    # SLIDE 32: Mathalino Problem 42 - Annotation Workspace
-    add_annotation_slide(
-        prs,
-        title="Mathalino Prob 42: Hydraulic Geometry Workspace",
-        frame_path="media/frames/MathalinoProblem5_TrapezoidalGutter_frame.png",
-        exercise_title="Trapezoidal Gutter (Mathalino 42)",
-        instructions=[
-            "Tin strip width = 14 inches. Base = a, two slant sides s = (14 - a)/2.",
-            "Bending angle θ = 45°. Height h = s sin 45° = (14 - a)/(2√2).",
-            "Area A = ah + h² = (14a - a²)/(2√2) + (14 - a)²/8.",
-            "Differentiate: dA/da = (7 - a)/√2 + (a - 14)/4 = 0.",
-            "Solve linear equation for a: a = 14(√2 - 1)/(2√2 - 1) ≈ 3.17 inches.",
-            "Compute slant sides: s = (14 - 3.17)/2 ≈ 5.41 inches."
-        ],
-        pencil_prompts=[
-            "✍️ Draw the cross-section trapezoid with base a, slants s, and height h.",
-            "✍️ Write cross-sectional area A in terms of base width a.",
-            "✍️ Differentiate dA/da = 0 and solve for base width a ≈ 3.17 inches."
-        ],
-        notes="Instructor Guidance: Demonstrate how civil and mechanical engineering channels are optimized for maximum flow."
-    )
+    # Right Card: Theoretical Foundations & Standards
+    c_ref_r = add_card(s22, Inches(6.9), Inches(1.5), Inches(5.633), Inches(5.4), border_color=CYAN)
+    tb_rr = s22.shapes.add_textbox(Inches(7.1), Inches(1.7), Inches(5.233), Inches(5.0))
+    tf_rr = tb_rr.text_frame
+    tf_rr.word_wrap = True
+    
+    p = tf_rr.paragraphs[0]
+    p.text = "CALCULUS TEXTS & VISUAL STANDARDS"
+    p.font.size = Pt(13)
+    p.font.bold = True
+    p.font.color.rgb = CYAN
+    
+    texts = [
+        ("James Stewart, Calculus: Early Transcendentals (9th Edition)", "Fermat's Theorem, Extreme Value Theorem, First & Second Derivative Tests, and optimization modeling frameworks."),
+        ("3Blue1Brown (Grant Sanderson), Essence of Calculus", "Kinematic visual intuition, rotating tangent vectors, geometric differential transformations, and continuous visual proofs."),
+        ("Engineering Electrical & Civil Reference Standards", "Maximum Power Transfer Theorem (Jacobi's Law, 1840) and open-channel hydraulic trapezoidal flow optimization."),
+        ("Instructional Presentation Platform", "Rendered via Manim Community Edition v0.22.0. Native Apple PencilKit inking support in Apple Keynote on iPad.")
+    ]
+    for b_title, b_desc in texts:
+        pt = tf_rr.add_paragraph()
+        pt.text = b_title
+        pt.font.size = Pt(11)
+        pt.font.bold = True
+        pt.font.color.rgb = TEXT_WHITE
+        pt.space_before = Pt(10)
+        pd = tf_rr.add_paragraph()
+        pd.text = b_desc
+        pd.font.size = Pt(10)
+        pd.font.color.rgb = TEXT_MUTED
+        pd.space_before = Pt(2)
 
     prs.save(output_pptx)
     import shutil

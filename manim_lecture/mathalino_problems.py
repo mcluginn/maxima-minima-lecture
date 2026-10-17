@@ -25,8 +25,8 @@ from common_theme import *
 class MathalinoProblem1_NumberOptimization(Scene):
     def construct(self):
         header = create_header(
-            "Mathalino Prob 1: Number Optimization",
-            "What number exceeds its square by the maximum amount? (Source: mathalino.com)",
+            "Optimization: Number Exceeding its Square",
+            "Finding the number that exceeds its square by the maximum amount",
             AMBER
         )
         self.play(Write(header), run_time=0.8)
@@ -90,8 +90,8 @@ class MathalinoProblem1_NumberOptimization(Scene):
 class MathalinoProblem2_RiverbankLot(Scene):
     def construct(self):
         header = create_header(
-            "Mathalino Prob 10: Riverbank Fencing Optimization",
-            "Minimum perimeter fence for fixed area A along a river (Source: mathalino.com)",
+            "Optimization: Riverbank Fencing Design",
+            "Minimum perimeter fence for fixed area A along a straight river",
             CYAN
         )
         self.play(Write(header), run_time=0.8)
@@ -153,8 +153,8 @@ class MathalinoProblem2_RiverbankLot(Scene):
 class MathalinoProblem3_OpenTopBox(Scene):
     def construct(self):
         header = create_header(
-            "Mathalino Prob 16: Open-Top Box Optimization",
-            "Cardboard 15\" × 24\": Cut corner squares x to maximize Volume (Source: mathalino.com)",
+            "Optimization: Open-Top Box Volume",
+            "Cardboard 15\" × 24\": Cut corner squares x to maximize Volume",
             AMBER
         )
         self.play(Write(header), run_time=0.8)
@@ -222,8 +222,8 @@ class MathalinoProblem3_OpenTopBox(Scene):
 class MathalinoProblem4_TourBusRevenue(Scene):
     def construct(self):
         header = create_header(
-            "Mathalino Prob 03: Applied Maximum Revenue",
-            "80-Seat Tour Bus: Balancing ticket price vs. demand (Source: mathalino.com)",
+            "Applied Optimization: Maximum Revenue",
+            "80-Seat Tour Bus: Balancing ticket price vs. passenger demand",
             GREEN
         )
         self.play(Write(header), run_time=0.8)
@@ -265,7 +265,7 @@ class MathalinoProblem4_TourBusRevenue(Scene):
             MathTex(r"\frac{dR}{dx} = 300 - 50x = 0 \implies \mathbf{x = 6}", font_size=22, color=GREEN),
             MathTex(r"\text{Optimal Fare: } p = 350 + 12.5(6) = \mathbf{\text{P}425/\text{seat}}", font_size=19, color=CYAN),
             MathTex(r"\text{Passengers: } q = 80 - 2(6) = \mathbf{68\text{ seats}}", font_size=19, color=AMBER),
-            MathTex(r"\mathbf{\text{Maximum Revenue} = 425 \times 68 = \text{P}28{,}900} \,\, \text{[Option C]}", font_size=21, color=AMBER)
+            MathTex(r"\mathbf{\text{Maximum Revenue} = 425 \times 68 = \text{P}28{,}900}", font_size=21, color=AMBER)
         ]
         group = VGroup(*steps).arrange(DOWN, buff=0.16).next_to(title, DOWN, buff=0.20)
 
@@ -285,8 +285,8 @@ class MathalinoProblem4_TourBusRevenue(Scene):
 class MathalinoProblem5_TrapezoidalGutter(Scene):
     def construct(self):
         header = create_header(
-            "Mathalino Prob 42: Trapezoidal Gutter Capacity",
-            "14-inch metal strip bent at 45°: Maximize hydraulic carrying capacity (Source: mathalino.com)",
+            "Engineering Optimization: Trapezoidal Gutter",
+            "14-inch metal strip bent at 45°: Maximizing hydraulic carrying capacity",
             CORAL
         )
         self.play(Write(header), run_time=0.8)

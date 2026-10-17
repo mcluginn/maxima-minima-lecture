@@ -7,13 +7,14 @@ This guide provides complete mathematical documentation, direct source citations
 
 ## 1. Master Curriculum Mapping & Source Checklist
 
-| Lecture Slide | Scene Identifier | Mathalino Problem Title | Primary Source URL | Target Variable | Verified Optimal Solution |
+| Lecture Slide | Scene Identifier | Problem Concept | Primary Source URL | Target Variable | Verified Optimal Solution |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **Slide 23** | `MathalinoProblem1_NumberOptimization` | Problem 1: Number exceeding square | [01-04 Number Problems](https://mathalino.com/reviewer/differential-calculus/01-04-number-problems-in-maxima-and-minima) | Number $x$ | $x = \frac{1}{2}$, $\text{Max Excess} = \frac{1}{4}$ |
-| **Slide 24** | `MathalinoProblem2_RiverbankLot` | Problem 10: Riverbank Fencing | [09-11 Rectangular Lot](https://mathalino.com/reviewer/differential-calculus/09-11-rectangular-lot-problems-in-maxima-and-minima) | Dimensions $(x, y)$ | $\text{Width } y = \frac{1}{2} \times \text{Length } x$ |
-| **Slide 25** | `MathalinoProblem3_OpenTopBox` | Problem 16: $15'' \times 24''$ Box | [15-17 Box Open at Top](https://mathalino.com/reviewer/differential-calculus/15-17-box-open-at-the-top) | Cut depth $x$ | $x = 3''$, $V_{\max} = 486\text{ in}^3$ |
-| **Slide 26** | `MathalinoProblem4_TourBusRevenue` | Problem 03: 80-Seat Tour Bus | [03 Maximum Revenue Tour Bus](https://mathalino.com/reviewer/differential-calculus/03-maximum-revenue-tour-bus-80-seats) | Fare increment $x$ | Fare $= \text{P}425$, $R_{\max} = \text{P}28{,}900$ |
-| **Slide 27** | `MathalinoProblem5_TrapezoidalGutter` | Problem 42: $14''$ Tin Strip Gutter | [41-42 Trapezoidal Gutter](https://mathalino.com/reviewer/differential-calculus/41-42-maxima-and-minima-problem-involving-a-trapezoidal-gutter) | Base width $a$ | $a \approx 3.17''$, $s \approx 5.41''$ |
+| **Slide 16** | `MathalinoProblem1_NumberOptimization` | Number Exceeding its Square | [01-04 Number Problems](https://mathalino.com/reviewer/differential-calculus/01-04-number-problems-in-maxima-and-minima) | Number $x$ | $x = \frac{1}{2}$, $\text{Max Excess} = \frac{1}{4}$ |
+| **Slide 17** | `MathalinoProblem2_RiverbankLot` | Riverbank Fencing Design | [09-11 Rectangular Lot](https://mathalino.com/reviewer/differential-calculus/09-11-rectangular-lot-problems-in-maxima-and-minima) | Dimensions $(x, y)$ | $\text{Width } y = \frac{1}{2} \times \text{Length } x$ |
+| **Slide 18** | `MathalinoProblem3_OpenTopBox` | Open-Top $15'' \times 24''$ Box | [15-17 Box Open at Top](https://mathalino.com/reviewer/differential-calculus/15-17-box-open-at-the-top) | Cut depth $x$ | $x = 3''$, $V_{\max} = 486\text{ in}^3$ |
+| **Slide 19** | `MathalinoProblem4_TourBusRevenue` | 80-Seat Tour Bus Revenue | [03 Maximum Revenue Tour Bus](https://mathalino.com/reviewer/differential-calculus/03-maximum-revenue-tour-bus-80-seats) | Fare increment $x$ | Fare $= \text{P}425$, $R_{\max} = \text{P}28{,}900$ |
+| **Slide 20** | `MathalinoProblem5_TrapezoidalGutter` | Trapezoidal Gutter $14''$ Strip | [41-42 Trapezoidal Gutter](https://mathalino.com/reviewer/differential-calculus/41-42-maxima-and-minima-problem-involving-a-trapezoidal-gutter) | Base width $a$ | $a \approx 3.17''$, $s \approx 5.41''$ |
+| **Slide 22** | *(Curriculum Bibliography)* | Full Academic Citations | [Mathalino Maxima & Minima](https://mathalino.com/reviewer/differential-calculus/application-of-maxima-and-minima) | Source References | Complete bibliographic index |
 
 ---
 
