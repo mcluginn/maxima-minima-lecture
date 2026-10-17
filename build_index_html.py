@@ -1355,7 +1355,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       slides[currentSlide].classList.remove('active');
 
       currentSlide = index;
-      resetZoom();
+      // Zoom position stays anchored where user set it
 
       // 4. Activate new slide
       const newSlide = slides[currentSlide];
@@ -1767,9 +1767,15 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
     function applyZoom(zoomFactor, resetPan = false) {
       currentZoom = Math.min(Math.max(zoomFactor, 1.0), 3.5);
-      if (resetPan || currentZoom === 1.0) {
+      if (resetPan || currentZoom <= 1.01) {
         panX = 0;
         panY = 0;
+        currentZoom = 1.0;
+      } else {
+        const maxPanX = ((currentZoom - 1) * (canvasDisplayWidth || 1360) * 0.45) / currentZoom;
+        const maxPanY = ((currentZoom - 1) * (canvasDisplayHeight || 765) * 0.45) / currentZoom;
+        panX = Math.max(-maxPanX, Math.min(maxPanX, panX));
+        panY = Math.max(-maxPanY, Math.min(maxPanY, panY));
       }
       stageContainer.style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
       const zoomDisplay = document.getElementById('zoomDisplay');
@@ -1787,11 +1793,18 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     }
 
     function resetZoom() {
+      stageContainer.style.transition = 'transform 0.25s cubic-bezier(0.16, 1, 0.3, 1)';
       applyZoom(1.0, true);
     }
 
-    document.getElementById('zoomInBtn').addEventListener('click', () => applyZoom(currentZoom + 0.25));
-    document.getElementById('zoomOutBtn').addEventListener('click', () => applyZoom(currentZoom - 0.25));
+    document.getElementById('zoomInBtn').addEventListener('click', () => {
+      stageContainer.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      applyZoom(currentZoom + 0.25);
+    });
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {
+      stageContainer.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
+      applyZoom(currentZoom - 0.25);
+    });
     document.getElementById('zoomResetBtn').addEventListener('click', resetZoom);
     const pkZoomResetBtn = document.getElementById('pkZoomResetBtn');
     if (pkZoomResetBtn) pkZoomResetBtn.addEventListener('click', resetZoom);
@@ -1803,10 +1816,11 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       return Math.hypot(dx, dy);
     }
 
-    // Touch Gestures: Allow 2-Finger Pinch-to-Zoom, Reject 1-Finger Palm
+    // Touch Gestures: Smooth Two-Finger Pinch-to-Zoom & Pan
     stageContainer.addEventListener('touchstart', (e) => {
       if (e.touches && e.touches.length === 2) {
         isPinching = true;
+        stageContainer.style.transition = 'none'; // Zero lag during pinch
         initialPinchDistance = getPinchDistance(e);
         initialZoom = currentZoom;
         pinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
@@ -1836,7 +1850,6 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         }
         e.preventDefault();
       } else if (e.touches && e.touches.length === 1) {
-        // Single touch (palm resting or finger)
         if (isDrawingMode && palmRejectionEnabled) {
           e.preventDefault();
         }
@@ -1847,23 +1860,14 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       if (!e.touches || e.touches.length < 2) {
         isPinching = false;
         initialPinchDistance = null;
-      }
-    });
-
-    // Double tap with two fingers to reset zoom
-    let lastTwoFingerTap = 0;
-    stageContainer.addEventListener('touchend', (e) => {
-      if (e.changedTouches && e.changedTouches.length === 2) {
-        const now = Date.now();
-        if (now - lastTwoFingerTap < 350) {
-          resetZoom();
-        }
-        lastTwoFingerTap = now;
+        stageContainer.style.transition = 'transform 0.2s cubic-bezier(0.16, 1, 0.3, 1)';
       }
     });
 
     // =========================================================================
-    // Multi-Tap Slide Hotkeys (Double-Tap = Next Slide, Triple-Tap = Back Slide)
+    // Multi-Tap Hotkeys:
+    // When zoomed in: Double-Tap ZOOMS OUT to 100%!
+    // When at 100%: Double-Tap advances to NEXT SLIDE, Triple-Tap to PREVIOUS!
     // =========================================================================
     let tapCount = 0;
     let tapTimeout = null;
@@ -1927,9 +1931,15 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 
       tapTimeout = setTimeout(() => {
         if (tapCount === 2) {
-          // DOUBLE TAP -> NEXT SLIDE!
-          showSlide(currentSlide + 1);
-          showToast(`⏭ Slide ${String(currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')} (Double Tap)`);
+          if (currentZoom > 1.05) {
+            // IF ZOOMED IN -> DOUBLE TAP ZOOMS OUT TO 100%!
+            resetZoom();
+            showToast('🔍 Zoom Reset (100%)');
+          } else {
+            // IF AT 100% -> DOUBLE TAP ADVANCES TO NEXT SLIDE!
+            showSlide(currentSlide + 1);
+            showToast(`⏭ Slide ${String(currentSlide + 1).padStart(2, '0')} / ${String(slides.length).padStart(2, '0')} (Double Tap)`);
+          }
         }
         tapCount = 0;
       }, TAP_THRESHOLD_MS);
