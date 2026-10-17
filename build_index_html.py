@@ -644,6 +644,10 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         <button style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.4); color: var(--green);" title="Download Keynote/PowerPoint Deck">📥 Keynote (.pptx)</button>
       </a>
 
+      <a href="Maxima_and_Minima_Lecture.pdf" download style="text-decoration:none;">
+        <button style="background: rgba(244, 63, 94, 0.15); border-color: rgba(244, 63, 94, 0.4); color: #FB7185;" title="Download PDF Backup for GoodNotes / Notability / iPad">📄 PDF Backup</button>
+      </a>
+
       <button id="notesBtn" title="Toggle Lecturer Teleprompter">📋 Notes</button>
       <button id="fsBtn" title="Fullscreen Presentation">⛶ Fullscreen</button>
     </div>
