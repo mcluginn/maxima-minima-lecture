@@ -9,7 +9,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=0.5, maximum-scale=5.0, user-scalable=yes">
   <title>Maxima & Minima — Motion-Based Engineering Calculus</title>
   <style>
     :root {
@@ -28,16 +28,14 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       background-color: var(--bg);
       color: var(--text);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      overflow: hidden;
-      height: 100vh;
-      width: 100vw;
-      position: fixed;
+      min-height: 100vh;
+      width: 100%;
       display: flex;
       flex-direction: column;
       user-select: none;
       -webkit-user-select: none;
       -webkit-touch-callout: none;
-      touch-action: none !important;
+      touch-action: pan-x pan-y pinch-zoom;
       overscroll-behavior: none !important;
       -webkit-tap-highlight-color: transparent;
     }
@@ -106,8 +104,9 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       justify-content: center;
       padding: 12px;
       background: radial-gradient(circle at 50% 30%, rgba(19, 27, 46, 0.5) 0%, #0B0F19 80%);
-      touch-action: none !important;
-      overscroll-behavior: none !important;
+      touch-action: pinch-zoom;
+      overscroll-behavior: none;
+      overflow: hidden;
     }
     .slide-container {
       width: 100%;
@@ -121,8 +120,9 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       overflow: hidden;
       box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.85);
       border: 1px solid rgba(51, 65, 85, 0.3);
-      touch-action: none !important;
-      overscroll-behavior: none !important;
+      touch-action: pinch-zoom;
+      transform-origin: center center;
+      transition: transform 0.12s ease-out;
     }
     .slide-container.drawing-locked * {
       user-select: none !important;
@@ -260,7 +260,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       width: 100%; height: 100%;
       z-index: 60;
       pointer-events: none;
-      touch-action: none !important;
+      touch-action: pinch-zoom;
     }
     #pencilCanvas.active {
       pointer-events: auto;
@@ -510,6 +510,13 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         <button id="drawBtn" title="Toggle Apple Pencil Inking">✍️ Apple Pencil</button>
       </div>
 
+      <!-- Quick Slide Zoom Controls -->
+      <div style="display: flex; align-items: center; gap: 4px; background: rgba(19, 27, 46, 0.85); border: 1px solid var(--card-border); border-radius: 6px; padding: 2px 6px;">
+        <button id="zoomOutBtn" title="Zoom Out Slide" style="padding: 3px 8px; font-size: 13px; border: none; background: transparent; cursor: pointer;">🔍−</button>
+        <button id="zoomResetBtn" title="Reset Zoom to 100%" style="padding: 3px 6px; font-size: 11px; font-weight: 700; border: none; background: transparent; color: var(--cyan); cursor: pointer;"><span id="zoomDisplay">100%</span></button>
+        <button id="zoomInBtn" title="Zoom In Slide" style="padding: 3px 8px; font-size: 13px; border: none; background: transparent; cursor: pointer;">+</button>
+      </div>
+
       <a href="maxima_minima_lecture.pptx" download style="text-decoration:none;">
         <button style="background: rgba(34, 197, 94, 0.15); border-color: rgba(34, 197, 94, 0.4); color: var(--green);" title="Download Keynote/PowerPoint Deck">📥 Keynote (.pptx)</button>
       </a>
@@ -560,6 +567,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
         <div class="pk-badge-palm" id="pkPalmBadge" title="Tap to toggle: Strict Apple Pencil (Palm Rejected) vs Touch Inking">
           <span> Palm Rejection: ON</span>
         </div>
+        <button class="pk-circle-btn" id="pkZoomResetBtn" title="Reset Zoom to 100%" style="width:28px;height:28px;font-size:10px;font-weight:700;">100%</button>
         <button class="pk-circle-btn" id="pkCloseBtn" title="Close Pencil Toolbar" style="width:26px;height:26px;font-size:11px;">✕</button>
       </div>
 
@@ -1324,6 +1332,7 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
       slides[currentSlide].classList.remove('active');
 
       currentSlide = index;
+      resetZoom();
 
       // Activate new slide
       const newSlide = slides[currentSlide];
@@ -1659,10 +1668,113 @@ HTML_TEMPLATE = r"""<!DOCTYPE html>
     canvas.addEventListener('pointerup', onPointerUp);
     canvas.addEventListener('pointercancel', onPointerUp);
 
-    // Prevent default iOS Safari touch behaviors on canvas
-    canvas.addEventListener('touchstart', (e) => e.preventDefault(), { passive: false });
-    canvas.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
-    canvas.addEventListener('touchend', (e) => e.preventDefault(), { passive: false });
+    // ==========================================
+    // Slide Zoom & Two-Finger Pinch-Zoom Engine
+    // ==========================================
+    let currentZoom = 1.0;
+    let panX = 0, panY = 0;
+    let initialPinchDistance = null;
+    let initialZoom = 1.0;
+    let pinchMidX = 0, pinchMidY = 0;
+    let isPinching = false;
+
+    function applyZoom(zoomFactor, resetPan = false) {
+      currentZoom = Math.min(Math.max(zoomFactor, 1.0), 3.5);
+      if (resetPan || currentZoom === 1.0) {
+        panX = 0;
+        panY = 0;
+      }
+      stageContainer.style.transform = `scale(${currentZoom}) translate(${panX}px, ${panY}px)`;
+      const zoomDisplay = document.getElementById('zoomDisplay');
+      if (zoomDisplay) zoomDisplay.textContent = `${Math.round(currentZoom * 100)}%`;
+      const zoomResetBtn = document.getElementById('zoomResetBtn');
+      if (zoomResetBtn) {
+        if (currentZoom > 1.0) {
+          zoomResetBtn.style.color = '#38BDF8';
+          zoomResetBtn.style.fontWeight = '800';
+        } else {
+          zoomResetBtn.style.color = 'var(--cyan)';
+          zoomResetBtn.style.fontWeight = '700';
+        }
+      }
+    }
+
+    function resetZoom() {
+      applyZoom(1.0, true);
+    }
+
+    document.getElementById('zoomInBtn').addEventListener('click', () => applyZoom(currentZoom + 0.25));
+    document.getElementById('zoomOutBtn').addEventListener('click', () => applyZoom(currentZoom - 0.25));
+    document.getElementById('zoomResetBtn').addEventListener('click', resetZoom);
+    const pkZoomResetBtn = document.getElementById('pkZoomResetBtn');
+    if (pkZoomResetBtn) pkZoomResetBtn.addEventListener('click', resetZoom);
+
+    function getPinchDistance(e) {
+      if (!e.touches || e.touches.length < 2) return null;
+      const dx = e.touches[0].clientX - e.touches[1].clientX;
+      const dy = e.touches[0].clientY - e.touches[1].clientY;
+      return Math.hypot(dx, dy);
+    }
+
+    // Touch Gestures: Allow 2-Finger Pinch-to-Zoom, Reject 1-Finger Palm
+    stageContainer.addEventListener('touchstart', (e) => {
+      if (e.touches && e.touches.length === 2) {
+        isPinching = true;
+        initialPinchDistance = getPinchDistance(e);
+        initialZoom = currentZoom;
+        pinchMidX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+        pinchMidY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+        e.preventDefault();
+      }
+    }, { passive: false });
+
+    stageContainer.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length === 2 && isPinching) {
+        const dist = getPinchDistance(e);
+        if (initialPinchDistance && dist) {
+          const scaleMultiplier = dist / initialPinchDistance;
+          const targetZoom = initialZoom * scaleMultiplier;
+
+          // Two-finger pan while zoomed in
+          const midX = (e.touches[0].clientX + e.touches[1].clientX) / 2;
+          const midY = (e.touches[0].clientY + e.touches[1].clientY) / 2;
+          if (targetZoom > 1.05) {
+            panX += (midX - pinchMidX) / targetZoom;
+            panY += (midY - pinchMidY) / targetZoom;
+          }
+          pinchMidX = midX;
+          pinchMidY = midY;
+
+          applyZoom(targetZoom);
+        }
+        e.preventDefault();
+      } else if (e.touches && e.touches.length === 1) {
+        // Single touch (palm resting or finger)
+        // If drawing mode is active, prevent card scrolling so resting palm doesn't drag
+        if (isDrawingMode && palmRejectionEnabled) {
+          e.preventDefault();
+        }
+      }
+    }, { passive: false });
+
+    stageContainer.addEventListener('touchend', (e) => {
+      if (!e.touches || e.touches.length < 2) {
+        isPinching = false;
+        initialPinchDistance = null;
+      }
+    });
+
+    // Double tap with two fingers to reset zoom
+    let lastTwoFingerTap = 0;
+    stageContainer.addEventListener('touchend', (e) => {
+      if (e.changedTouches && e.changedTouches.length === 2) {
+        const now = Date.now();
+        if (now - lastTwoFingerTap < 350) {
+          resetZoom();
+        }
+        lastTwoFingerTap = now;
+      }
+    });
 
     // Initial load
     showSlide(0);
